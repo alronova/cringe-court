@@ -63,6 +63,19 @@ brows above the shades. Say the word and I'll do (b) — it's a 10-line change.
 
 ---
 
+## Portraits
+
+```
+characters/<id>/portraits/{neutral,smug,shocked,defeated}{,_32,@2x}.png   # 64 / 32 / 128 px
+characters/_previews/portraits.png                                       # contact sheet
+characters/portraits.json                                                # index
+```
+
+Head-and-shoulders busts on dialogue-box plum, cropped from the voxel render
+(`export-portraits.mjs`). `defeated` uses the crying face. Expression contrast is
+only as good as the face rig; re-run after the face rig (`feat/voxel-expressions`)
+lands for much stronger differences.
+
 ## Poses
 
 ```
@@ -144,6 +157,7 @@ cd cc-art
 node export-all.mjs   # characters
 node ui-kit.mjs       # UI
 node fx-kit.mjs       # FX
+node export-portraits.mjs   # dialogue portraits
 ```
 
 ---
