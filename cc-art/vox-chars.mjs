@@ -205,8 +205,7 @@ export const CLERK = {
     // round glasses
     for (const sx of [-1, 1]) {
       const ex = sx * H.eyeX;
-      out.push(b([ex - 3.2, H.eyeY - 2.6, -hw - 1.8], [ex + 3.2, H.eyeY + 3.4, -hw - 1.2], C.goldDk));
-      out.push(b([ex - 2.6, H.eyeY - 2, -hw - 2], [ex + 2.6, H.eyeY + 2.8, -hw - 1.4], '#EAF4FF'));
+      out.push(...rims(ex, H.eyeY + 0.4, 3.2, 3, -hw - 1.9, C.goldDk));
     }
     out.push(b([-2.6, H.eyeY - 0.4, -hw - 1.9], [2.6, H.eyeY + 0.6, -hw - 1.3], C.goldDk));
 
@@ -255,6 +254,17 @@ export const NARRATOR = {
   },
 };
 
+/** Open glasses frame (four bars) so the eyes behind stay readable. */
+function rims(cx, cy, hw, hh, z, m) {
+  const t = 0.8;
+  return [
+    b([cx - hw, cy + hh - t, z], [cx + hw, cy + hh, z + 0.6], m),
+    b([cx - hw, cy - hh, z], [cx + hw, cy - hh + t, z + 0.6], m),
+    b([cx - hw, cy - hh, z], [cx - hw + t, cy + hh, z + 0.6], m),
+    b([cx + hw - t, cy - hh, z], [cx + hw, cy + hh, z + 0.6], m),
+  ];
+}
+
 /** The narrator's screen face: pixel glyphs on the -z display plane. */
 function screenFace(expr, cy) {
   const z0 = -14.1, z1 = -13.6, px = (x0, y0, x1, y1, m = C.ink) => b([x0, cy + y0, z0], [x1, cy + y1, z1], m);
@@ -299,8 +309,7 @@ export const JUROR = {
     // oversized round glasses
     for (const sx of [-1, 1]) {
       const ex = sx * H.eyeX;
-      out.push(b([ex - 4, H.eyeY - 3.4, -hw - 2], [ex + 4, H.eyeY + 4.2, -hw - 1.2], C.hairBrSh));
-      out.push(b([ex - 3.2, H.eyeY - 2.8, -hw - 2.2], [ex + 3.2, H.eyeY + 3.6, -hw - 1.4], '#E8F6FF'));
+      out.push(...rims(ex, H.eyeY + 0.4, 4, 3.8, -hw - 2.1, C.hairBrSh));
     }
     out.push(b([-3.2, H.eyeY - 0.6, -hw - 2.1], [3.2, H.eyeY + 0.6, -hw - 1.3], C.hairBrSh));
 
