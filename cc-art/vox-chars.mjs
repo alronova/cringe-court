@@ -7,6 +7,9 @@ export { head };
 /** Replace the face boxes for a given expression.
  *  char.parts(pose, expr) passes `expr` through to head(), so the eye/mouth
  *  geometry is rebuilt per expression instead of recoloured. */
+/** Mouth per expression, for characters whose shades hide the eyes. */
+const MOUTH = { neutral: 'neutral', happy: 'grin', angry: 'grit', shocked: 'shout', laughing: 'grin', crying: 'frown', confused: 'frown', smug: 'smirk' };
+
 const FACE_MATS = new Set(['#FFFFFF', '#3B2A28', '#241A22', '#5A4234', '#8E3B42', '#7A3340', '#D2686E', '#E8C4A8', '#D2A98C', '#B48A6C']);
 
 /* ══════════════════════════════════ JUDGE ══════════════════════════════════ */
@@ -30,7 +33,7 @@ export const JUDGE = {
     out.push(...pair([-hw - 1, H.headBot - 1, -hw + 1], [-hw + 1.5, H.headBot + 14, -hw + 5], C.hairSSh));
 
     // ── face (shades) ───────────────────────────────────────────────
-    out.push(...head({ eyeStyle: 'shades', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' ? 'grin' : expr === 'happy' ? 'grin' : 'neutral' }));
+    out.push(...head({ eyeStyle: 'shades', mouth: MOUTH[expr], hair: C.hairSDk, expr }));
 
     // ── beard: BELOW the face, tapering. Kept clear of the mouth line so the
     //    face stays readable (a beard over the mouth made every pose identical).
@@ -102,9 +105,9 @@ export const PROSECUTOR = {
       out.push(b([-hw + i * 4.6, H.eyeY + 5, -hw - 1.4], [-hw + 4.2 + i * 4.6, H.headTop + 1, -hw + 2], i % 2 ? Plt : P));
     }
 
-    out.push(...head({ eyeStyle: expr === 'happy' || expr === 'laughing' ? 'round' : 'sharp', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : 'grit', hair: P }));
-    // pink iris override
-    for (const sx of [-1, 1]) {
+    out.push(...head({ eyeStyle: expr === 'happy' || expr === 'laughing' ? 'round' : 'sharp', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : 'grit', hair: P, expr }));
+    // pink iris override (not over closed or pinprick eyes)
+    if (expr !== 'laughing' && expr !== 'shocked') for (const sx of [-1, 1]) {
       const ex = sx * H.eyeX;
       out.push(b([ex - 1.4, H.eyeY - 0.6, -hw - 1.1], [ex + 1.4, H.eyeY + 1.6, -hw - 0.4], Psh));
     }
@@ -139,7 +142,7 @@ export const DEFENSE = {
     }
     out.push(b([2, H.headTop + 10, -3], [4, H.headTop + 15, 0], Blt)); // cowlick
 
-    out.push(...head({ eyeStyle: 'round', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : expr === 'smug' ? 'smirk' : 'neutral', hair: Br }));
+    out.push(...head({ eyeStyle: 'round', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : expr === 'smug' ? 'smirk' : 'neutral', hair: Br, expr }));
     // bandage on cheek
     out.push(b([4, H.mouthY + 6, -hw - 1.4], [9, H.mouthY + 9, -hw - 0.4], C.cream));
 
@@ -165,7 +168,7 @@ export const BAILIFF = {
     out.push(b([-hw, H.headBot + 10, -hw], [hw, H.headTop + 1, hw + 1], C.hairBrSh));
     out.push(b([-hw + 1, H.headTop - 3, -hw - 1], [hw - 1, H.headTop + 1, -hw + 2], C.hairBr));
 
-    out.push(...head({ eyeStyle: 'sharp', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' ? 'frown' : 'neutral', hair: C.hairBrSh }));
+    out.push(...head({ eyeStyle: 'sharp', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' ? 'frown' : 'neutral', hair: C.hairBrSh, expr }));
 
     // peaked cap
     out.push(b([-hw - 2, H.headTop + 1, -hw - 1], [hw + 2, H.headTop + 5, hw + 1], C.navy));
@@ -198,7 +201,7 @@ export const CLERK = {
       out.push(b([-hw + i * 4.6, H.eyeY + 6, -hw - 1.3], [-hw + 4.2 + i * 4.6, H.headTop + 1, -hw + 2], i % 2 ? Br : Bsh));
     }
 
-    out.push(...head({ eyeStyle: 'round', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : 'neutral', hair: Br }));
+    out.push(...head({ eyeStyle: 'round', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : 'neutral', hair: Br, expr }));
     // round glasses
     for (const sx of [-1, 1]) {
       const ex = sx * H.eyeX;
@@ -235,9 +238,7 @@ export const NARRATOR = {
     // screen face
     out.push(b([-13, cy - 8, -13.4], [13, cy + 8, -12.4], C.ink));
     out.push(b([-12, cy - 7, -13.8], [12, cy + 7, -13.2], C.cyanLt));
-    out.push(...pair([-8, cy - 3, -14.1], [-4, cy + 2, -13.6], C.ink));
-    out.push(b([-2.8, cy - 1, -14.1], [2.8, cy + 0.6, -13.6], C.ink));
-    out.push(b([-2, cy - 5, -14.1], [2, cy - 3.8, -13.6], C.ink));
+    out.push(...screenFace(expr, cy));
     // side pods
     out.push(...pair([-19, cy - 8, -6], [-16, cy + 10, 6], C.purple));
     out.push(...pair([-19.4, cy - 4, -4], [-18.8, cy + 6, 4], C.cyan));
@@ -254,6 +255,33 @@ export const NARRATOR = {
   },
 };
 
+/** The narrator's screen face: pixel glyphs on the -z display plane. */
+function screenFace(expr, cy) {
+  const z0 = -14.1, z1 = -13.6, px = (x0, y0, x1, y1, m = C.ink) => b([x0, cy + y0, z0], [x1, cy + y1, z1], m);
+  const eyes = {
+    neutral:  () => pair([-8, cy - 3, z0], [-4, cy + 2, z1], C.ink),
+    happy:    () => [px(-9, 0, -7, 1.4), px(-7, 1.4, -5, 2.8), px(-5, 0, -3, 1.4), px(3, 0, 5, 1.4), px(5, 1.4, 7, 2.8), px(7, 0, 9, 1.4)],
+    angry:    () => [px(-9, 2, -6, 3.2), px(-6, 1, -3, 2.2), px(-8, -3, -4, 0.6), px(3, 1, 6, 2.2), px(6, 2, 9, 3.2), px(4, -3, 8, 0.6)],
+    shocked:  () => [px(-9, -3, -3, 3), px(-7.6, -1.6, -4.4, 1.6, C.cyanLt), px(3, -3, 9, 3), px(4.4, -1.6, 7.6, 1.6, C.cyanLt)],
+    laughing: () => [px(-9, 1, -6, 2.2), px(-6, -0.2, -4, 1), px(-9, -1.4, -6, -0.2), px(6, 1, 9, 2.2), px(4, -0.2, 6, 1), px(6, -1.4, 9, -0.2)],
+    crying:   () => [...pair([-8, cy - 1, z0], [-4, cy + 2, z1], C.ink), px(-7, -6.6, -5.6, -1, C.blue), px(5.6, -6.6, 7, -1, C.blue)],
+    confused: () => [px(-8, -3, -4, 2), px(4.6, -1, 7.4, 1)],
+    smug:     () => [px(-8.6, -0.6, -3.4, 1), px(-8, -2, -4, -0.6), px(3.4, -0.6, 8.6, 1), px(4, -2, 8, -0.6)],
+  };
+  const mouths = {
+    neutral:  () => [px(-2.8, -6, 2.8, -4.8)],
+    happy:    () => [px(-3.6, -5, -2.4, -3.8), px(-2.4, -6.2, 2.4, -5), px(2.4, -5, 3.6, -3.8)],
+    angry:    () => [px(-3.4, -6.2, 3.4, -4.4), px(-2.6, -5.6, 2.6, -5, C.cyanLt)],
+    shocked:  () => [px(-1.8, -6.8, 1.8, -3.6), px(-0.9, -6, 0.9, -4.4, C.cyanLt)],
+    laughing: () => [px(-3.6, -6.8, 3.6, -4.2), px(-2.6, -6.2, 2.6, -5.2, C.cyanLt)],
+    crying:   () => [px(-3.6, -6.2, -2.4, -5), px(-2.4, -5, 2.4, -3.8), px(2.4, -6.2, 3.6, -5)],
+    confused: () => [px(-3, -5.4, -1, -4.2), px(-1, -6.2, 1, -5), px(1, -5.4, 3, -4.2)],
+    smug:     () => [px(-2.8, -6, 2, -4.8), px(2, -4.8, 3.4, -3.6)],
+  };
+  const e = eyes[expr] ? expr : 'neutral';
+  return [...eyes[e](), ...mouths[e]()];
+}
+
 /* ═══════════════════════════════ JUROR ═════════════════════════════════════ */
 export const JUROR = {
   id: 'juror', label: 'Juror / Voter',
@@ -267,7 +295,7 @@ export const JUROR = {
       out.push(b([-hw + i * 4.6, H.eyeY + 6, -hw - 1.3], [-hw + 4.2 + i * 4.6, H.headTop + 1, -hw + 2], i % 2 ? Br : Bsh));
     }
 
-    out.push(...head({ eyeStyle: 'round', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : 'neutral', hair: Br }));
+    out.push(...head({ eyeStyle: 'round', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : 'neutral', hair: Br, expr }));
     // oversized round glasses
     for (const sx of [-1, 1]) {
       const ex = sx * H.eyeX;
@@ -312,7 +340,7 @@ export const CREATOR = {
       out.push(b([x, H.headTop + 1, -hw + 2], [x + w2, H.headTop + 1 + h2, hw - 3], (x + h2) % 2 ? Br : Bsh));
     }
 
-    out.push(...head({ eyeStyle: 'shades', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : 'neutral', hair: Br }));
+    out.push(...head({ eyeStyle: 'shades', mouth: MOUTH[expr], hair: Br, expr }));
 
     out.push(...torso({ col: C.pink, colSh: C.pinkSh, style: 'hoodie' }));
     out.push(...arms({ col: C.pink, colSh: C.pinkSh, cuff: C.pinkSh }));
