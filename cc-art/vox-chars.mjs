@@ -91,7 +91,7 @@ export const PROSECUTOR = {
     const P = C.hairPk, Psh = C.hairPkSh, Plt = C.hairPkLt;
 
     // long twin-tail hair
-    out.push(b([-hw - 2, H.headBot + 4, -hw - 1], [hw + 2, H.headTop + 3, hw], P));
+    out.push(b([-hw - 2, H.headBot + 4, -hw + 3], [hw + 2, H.headTop + 3, hw], P));
     out.push(b([-hw - 3, H.headBot - 2, hw - 4], [hw + 3, H.headTop, hw + 3], Psh));
     for (const sx of [-1, 1]) {
       for (let i = 0; i < 5; i++) {
@@ -132,7 +132,7 @@ export const DEFENSE = {
     const Br = C.hairBr, Bsh = C.hairBrSh, Blt = C.hairBrLt;
 
     // messy spiky hair
-    out.push(b([-hw - 1, H.headBot + 8, -hw], [hw + 1, H.headTop + 2, hw + 1], Br));
+    out.push(b([-hw - 1, H.headBot + 8, -hw + 3], [hw + 1, H.headTop + 2, hw + 1], Br));   // mass sits behind the face plane
     const spikes = [[-hw - 1, 6, 4], [-hw + 3, 9, 4], [-1, 11, 4], [hw - 6, 9, 4], [hw - 2, 6, 3.4]];
     for (const [x, h2, w2] of spikes) {
       out.push(b([x, H.headTop + 1, -hw + 2], [x + w2, H.headTop + 1 + h2, hw - 3], (x + h2) % 2 ? Bsh : Br));
@@ -144,7 +144,7 @@ export const DEFENSE = {
 
     out.push(...head({ eyeStyle: 'round', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' || expr === 'confused' ? 'frown' : expr === 'smug' ? 'smirk' : 'neutral', hair: Br, expr }));
     // bandage on cheek
-    out.push(b([4, H.mouthY + 6, -hw - 1.4], [9, H.mouthY + 9, -hw - 0.4], C.cream));
+    out.push(b([5, H.mouthY + 1.4, -hw - 1.4], [9.4, H.mouthY + 3.8, -hw - 0.4], C.cream));
 
     out.push(...torso({ col: C.navy, colSh: C.navySh, style: 'suit' }));
     out.push(...arms({ col: C.navy, colSh: C.navySh, cuff: C.cream }));
@@ -165,7 +165,7 @@ export const BAILIFF = {
     const hw = H.headW;
 
     // cropped hair
-    out.push(b([-hw, H.headBot + 10, -hw], [hw, H.headTop + 1, hw + 1], C.hairBrSh));
+    out.push(b([-hw, H.headBot + 10, -hw + 3], [hw, H.headTop + 1, hw + 1], C.hairBrSh));
     out.push(b([-hw + 1, H.headTop - 3, -hw - 1], [hw - 1, H.headTop + 1, -hw + 2], C.hairBr));
 
     out.push(...head({ eyeStyle: 'sharp', mouth: expr === 'shocked' ? 'shout' : expr === 'laughing' || expr === 'happy' ? 'grin' : expr === 'crying' ? 'frown' : 'neutral', hair: C.hairBrSh, expr }));
@@ -194,7 +194,7 @@ export const CLERK = {
     const hw = H.headW;
     const Br = C.hairBr, Bsh = C.hairBrSh;
 
-    out.push(b([-hw - 1, H.headBot + 8, -hw], [hw + 1, H.headTop + 2, hw + 1], Br));
+    out.push(b([-hw - 1, H.headBot + 8, -hw + 3], [hw + 1, H.headTop + 2, hw + 1], Br));   // mass sits behind the face plane
     // bun
     out.push(b([-5, H.headTop + 2, hw - 4], [5, H.headTop + 9, hw + 2], Bsh));
     for (let i = 0; i < 5; i++) {
@@ -290,7 +290,7 @@ export const JUROR = {
     const hw = H.headW;
     const Br = C.hairBr, Bsh = C.hairBrSh;
 
-    out.push(b([-hw - 1, H.headBot + 8, -hw], [hw + 1, H.headTop + 2, hw + 1], Br));
+    out.push(b([-hw - 1, H.headBot + 8, -hw + 3], [hw + 1, H.headTop + 2, hw + 1], Br));   // mass sits behind the face plane
     for (let i = 0; i < 5; i++) {
       out.push(b([-hw + i * 4.6, H.eyeY + 6, -hw - 1.3], [-hw + 4.2 + i * 4.6, H.headTop + 1, -hw + 2], i % 2 ? Br : Bsh));
     }
@@ -334,7 +334,7 @@ export const CREATOR = {
     const hw = H.headW;
     const Br = C.hairBr, Bsh = C.hairBrSh;
 
-    out.push(b([-hw - 1, H.headBot + 8, -hw], [hw + 1, H.headTop + 2, hw + 1], Bsh));
+    out.push(b([-hw - 1, H.headBot + 8, -hw + 3], [hw + 1, H.headTop + 2, hw + 1], Bsh));
     const spikes = [[-hw - 1, 6, 4], [-hw + 3, 9, 4], [-1, 11, 4], [hw - 6, 9, 4], [hw - 2, 6, 3.4]];
     for (const [x, h2, w2] of spikes) {
       out.push(b([x, H.headTop + 1, -hw + 2], [x + w2, H.headTop + 1 + h2, hw - 3], (x + h2) % 2 ? Br : Bsh));
