@@ -24,13 +24,15 @@ export const PRIVATE_NOTES_MAX = 600;
 export const TITLE_MAX = 80;
 
 /**
- * Demo-speed deadlines (D14: "Demo-speed deadlines are labelled as demo
- * settings"). The real Solo windows are 30 / 20 / 10 minutes.
+ * Demo deadlines (D14: "Demo-speed deadlines are labelled as demo settings").
+ * The real Solo windows are 30 / 20 / 10 minutes. The commit window is long
+ * enough to watch the whole trial first; the demo clock skips ahead once every
+ * NPC juror has acted.
  */
 export const DEMO_DEADLINES: Readonly<Pick<Deadlines, 'recruitment' | 'commit' | 'reveal'>> = {
-  recruitment: 90,
-  commit: 45,
-  reveal: 30,
+  recruitment: 300,
+  commit: 900,
+  reveal: 300,
 };
 
 export interface SoloTermsOptions {
