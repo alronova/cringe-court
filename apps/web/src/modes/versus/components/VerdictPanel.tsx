@@ -1,11 +1,12 @@
 import { formatUsdc, type CaseNumber, type Hex } from '@cringe-court/core';
 import { claimable, claimedBy, disclose, receiptFor, roleLabel, seatsOf, sideLabel, type VersusCase, type Viewer } from '@cringe-court/modes-versus';
 import { useEffect, useRef } from 'react';
-import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, DialogueBox, Icon, OrnateFrame, Portrait, Receipt, Spinner, Stamp } from '@/ds';
+import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, DialogueBox, Icon, Portrait, Receipt, Spinner, Stamp } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
 import { TrialView } from './TrialView';
 import { ShareCard } from './ShareCard';
+import { PaperSection } from './PaperSection';
 
 /** Your receipt from the ledger, and the claim button (pull payments, V4 §9). */
 export function ClaimCard({ c, caseNumber }: { c: VersusCase; caseNumber: CaseNumber | null }) {
@@ -71,7 +72,7 @@ export function VerdictPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }) {
 
   return (
     <div className={styles.stack}>
-      <OrnateFrame as="section" padding="lg" tone="wood" aria-labelledby="verdict-title" className={styles.verdict} data-outcome={winner ?? 'none'}>
+      <PaperSection as="section" padding="lg" tone="maroon" aria-labelledby="verdict-title" className={styles.verdict} data-outcome={winner ?? 'none'}>
         <p className={styles.eyebrow}>The jury has spoken</p>
         <h2 id="verdict-title" className="cc-visually-hidden">
           Verdict: {winner ? `${winner === 'a' ? labelA : labelB} wins` : 'no verdict'}, {v.tally[0]} to {v.tally[1]}
@@ -108,7 +109,7 @@ export function VerdictPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }) {
         <p className={styles.fineOnWood}>
           {v.completedDuty} of {v.appointed} jurors finished duty. The AI argued; humans decided.
         </p>
-      </OrnateFrame>
+      </PaperSection>
 
       {s.sentence ? (
         <DialogueBox speaker="judge" expression="smug" text={s.sentence.text} />

@@ -1,11 +1,12 @@
 import { formatUsdc, usdc } from '@cringe-court/core';
 import { jurorStake, seatsOf, sideLabel, type VersusCase, type Viewer } from '@cringe-court/modes-versus';
 import { useEffect, useState } from 'react';
-import { Alert, Amount, Badge, Button, Card, CardBody, CardHeader, CardTitle, Icon, OrnateFrame, RadioCards, Stamp, useToast } from '@/ds';
+import { Alert, Amount, Badge, Button, Card, CardBody, CardHeader, CardTitle, Icon, PaperButton, RadioCards, Stamp, useToast } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
 import { TrialView } from './TrialView';
 import { WorldIdDialog } from './WorldIdDialog';
+import { PaperSection } from './PaperSection';
 
 function SeatRow({ c }: { c: VersusCase }) {
   const seats = seatsOf(c);
@@ -38,7 +39,7 @@ export function RecruitingPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }
   const link = `${window.location.origin}/versus/case/${c.trialId}`;
   return (
     <div className={styles.stack}>
-      <OrnateFrame as="section" padding="lg" ribbon="Jury selection" aria-labelledby="jury-title">
+      <PaperSection as="section" padding="lg" ribbon="Jury selection" aria-labelledby="jury-title">
         <h2 id="jury-title" className={styles.panelTitle}>
           {viewer === 'juror' ? 'You have a seat. Waiting for the rest of the jury.' : party ? 'Both halves are in. Calling the jury.' : 'This jury needs you'}
         </h2>
@@ -50,23 +51,23 @@ export function RecruitingPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }
           <Alert tone="info" title="Where do jurors come from?">
             In production the court draws random verified jurors from the waiting pool. In this demo court, open the case link in another tab to sit as a juror, or fill the seats with simulated jurors from Demo controls.
             <div className={styles.inlineActions}>
-              <Button
-                size="sm"
-                variant="secondary"
-                iconStart={<Icon name="copy" />}
-                onClick={() =>
-                  void navigator.clipboard
-                    .writeText(link)
-                    .then(() => toast({ title: 'Jury link copied', tone: 'success' }))
-                    .catch(() => toast({ title: 'Copy did not work here', tone: 'warning' }))
-                }
-              >
+              <PaperButton
+        size="sm"
+        variant="maroon"
+        iconStart={<Icon name="copy" />}
+        onClick={() =>
+         void navigator.clipboard
+          .writeText(link)
+          .then(() => toast({ title: 'Jury link copied', tone: 'success' }))
+          .catch(() => toast({ title: 'Copy did not work here', tone: 'warning' }))
+        }
+       >
                 Copy jury link
-              </Button>
+              </PaperButton>
             </div>
           </Alert>
         )}
-      </OrnateFrame>
+      </PaperSection>
 
       {!party && viewer !== 'juror' && (
         <Card as="section" tone="ornate" aria-labelledby="summons-title">
@@ -108,9 +109,9 @@ export function RecruitingPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }
             </ul>
             <div className={styles.inlineActions}>
               {short && (
-                <Button variant="secondary" iconStart={<Icon name="plus" />} onClick={() => void run(() => desk.faucet(usdc('5.00')), { success: 'Added 5.00 test USDC' })}>
+                <PaperButton variant="maroon" iconStart={<Icon name="plus" />} onClick={() => void run(() => desk.faucet(usdc('5.00')), { success: 'Added 5.00 test USDC' })}>
                   Get test USDC for the bond
-                </Button>
+                </PaperButton>
               )}
               <WorldIdDialog
                 title="Prove you are a unique human"
@@ -191,9 +192,9 @@ function BallotPanel({ c }: { c: VersusCase }) {
         <Alert tone="warning" title="Open your scroll now">
           The vote only counts once it is opened. Miss this window and the bond is forfeited.
         </Alert>
-        <Button size="lg" iconStart={<Icon name="unlock" />} onClick={() => void run(() => desk.revealBallot(c.trialId), { success: 'Scroll opened. Your vote is counted.' })}>
+        <PaperButton size="lg" iconStart={<Icon name="unlock" />} onClick={() => void run(() => desk.revealBallot(c.trialId), { success: 'Scroll opened. Your vote is counted.' })}>
           Open my scroll{sealed !== null ? ` (${labels[sealed]})` : ''}
-        </Button>
+        </PaperButton>
       </div>
     );
   } else {
@@ -224,9 +225,9 @@ export function TrialPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }) {
   const revealed = seats.filter((x) => x.revealed).length;
   return (
     <div className={styles.stack}>
-      <OrnateFrame as="section" padding="md" ribbon="Court is in session" aria-label="The trial">
+      <PaperSection as="section" padding="md" ribbon="Court is in session" aria-label="The trial">
         <TrialView lines={s.transcript.lines} exhibits={s.exhibits} filing={s.filing} seats={seats} jurySize={s.terms.jurySize} />
-      </OrnateFrame>
+      </PaperSection>
       {viewer === 'juror' ? (
         <BallotPanel c={c} />
       ) : (

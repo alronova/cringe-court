@@ -21,6 +21,7 @@ import {
   type Usdc,
 } from '@cringe-court/core';
 import { otherSide } from './definition';
+import { sideCharges } from './economics';
 import type { VersusCase } from './world';
 
 export type Viewer = SideId | 'juror' | 'invitee' | 'spectator';
@@ -191,9 +192,19 @@ export function claimable(c: VersusCase, account: Hex): Usdc {
   return statementFor(settlement, lower(account) as Hex).payout;
 }
 
+/**
+ * Your lines on the settlement. A side whose half was spent on a trial that
+ * reached a verdict gets nothing back from the ledger, so its receipt itemises
+ * where that half went instead of showing an empty statement.
+ */
 export function receiptFor(c: VersusCase, account: Hex): readonly ReceiptLine[] {
   const settlement = 'settlement' in c.state ? c.state.settlement : null;
-  return settlement ? statementFor(settlement, lower(account) as Hex).lines : [];
+  if (!settlement) return [];
+  const lines = statementFor(settlement, lower(account) as Hex).lines;
+  const side = viewerOf(c, account);
+  if (lines.length > 0 || (side !== 'a' && side !== 'b') || !settlement.verdict || settlement.verdict.kind === 'no-verdict') return lines;
+  const charge = sideCharges(c.state.terms)[side === 'a' ? 0 : 1];
+  return charge.parts.filter((p) => p.amount > 0n).map((p) => ({ kind: 'fee' as const, label: `Spent: ${p.label.charAt(0).toLowerCase()}${p.label.slice(1)}`, amount: p.amount }));
 }
 
 export function claimedBy(c: VersusCase, account: Hex): Usdc | null {

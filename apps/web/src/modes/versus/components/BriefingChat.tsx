@@ -1,7 +1,7 @@
 import type { AngleSuggestion, Category, SideId } from '@cringe-court/core';
 import { BRIEFING_QUESTIONS, BRIEFING_STEPS, agentReply, composeStory, type BriefingDraft, type BriefingStep } from '@cringe-court/modes-versus';
 import { useEffect, useId, useRef, useState } from 'react';
-import { Button, Icon, Portrait, RadioCards, Spinner, TextArea, TextField } from '@/ds';
+import { Icon, PaperButton, Portrait, RadioCards, Spinner, TextArea, TextField } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from './Briefing.module.css';
 
@@ -100,7 +100,8 @@ export function BriefingChat({ side, category, value, onChange, onDone, trialId 
         </div>
       </header>
 
-      <ol className={styles.log} ref={logRef} role="log" aria-live="polite" aria-label={`Conversation with ${agentName}`}>
+      <div className={styles.log} role="log" aria-live="polite" aria-label={`Conversation with ${agentName}`}>
+        <ol className={styles.turns} ref={logRef}>
         {BRIEFING_STEPS.slice(0, turn + 1).map((s, i) => {
           const ask = BRIEFING_QUESTIONS[s];
           const answer = answerOf(s).trim();
@@ -131,7 +132,8 @@ export function BriefingChat({ side, category, value, onChange, onDone, trialId 
             </li>
           );
         })}
-      </ol>
+        </ol>
+      </div>
 
       <div className={styles.composer}>
         {step === 'angle' ? (
@@ -179,18 +181,18 @@ export function BriefingChat({ side, category, value, onChange, onDone, trialId 
         )}
         <div className={styles.composerActions}>
           {turn > 0 && (
-            <Button variant="ghost" iconStart={<Icon name="arrow-left" />} onClick={() => setTurn(turn - 1)}>
+            <PaperButton variant="ghost" iconStart={<Icon name="arrow-left" />} onClick={() => setTurn(turn - 1)}>
               Back
-            </Button>
+            </PaperButton>
           )}
           {step === 'private' && !value.privateNotes.trim() && (
-            <Button variant="secondary" onClick={next}>
+            <PaperButton variant="maroon" onClick={next}>
               Skip
-            </Button>
+            </PaperButton>
           )}
-          <Button iconEnd={<Icon name="arrow-right" />} onClick={next} disabled={step === 'angle' && angles === null}>
+          <PaperButton iconEnd={<Icon name="arrow-right" />} onClick={next} disabled={step === 'angle' && angles === null}>
             {turn === BRIEFING_STEPS.length - 1 ? 'Review my brief' : 'Send'}
-          </Button>
+          </PaperButton>
         </div>
       </div>
     </section>

@@ -1,8 +1,9 @@
 import { invitePath, type VersusCase } from '@cringe-court/modes-versus';
 import { useState } from 'react';
-import { Alert, Button, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, OrnateFrame, useToast } from '@/ds';
+import { Alert, Button, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, PaperButton, useToast } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
+import { PaperSection } from './PaperSection';
 
 /** Side A, waiting for Side B: the code, the link, ways to send them, and a way out. */
 export function InvitePanel({ c }: { c: VersusCase }) {
@@ -23,7 +24,7 @@ export function InvitePanel({ c }: { c: VersusCase }) {
   };
 
   return (
-    <OrnateFrame as="section" padding="lg" ribbon="Invite Side B" aria-labelledby="invite-title" className={styles.invite}>
+    <PaperSection as="section" padding="lg" ribbon="Invite Side B" aria-labelledby="invite-title" className={styles.invite}>
       <h2 id="invite-title" className={styles.panelTitle}>
         Send this to the other side
       </h2>
@@ -35,16 +36,16 @@ export function InvitePanel({ c }: { c: VersusCase }) {
           {c.code}
         </p>
         <div className={styles.codeActions}>
-          <Button variant="secondary" size="sm" iconStart={<Icon name={copied === 'code' ? 'check' : 'copy'} />} onClick={() => void copy('code')}>
+          <PaperButton variant="maroon" size="sm" iconStart={<Icon name={copied === 'code' ? 'check' : 'copy'} />} onClick={() => void copy('code')}>
             Copy code
-          </Button>
-          <Button size="sm" iconStart={<Icon name={copied === 'link' ? 'check' : 'copy'} />} onClick={() => void copy('link')}>
+          </PaperButton>
+          <PaperButton size="sm" iconStart={<Icon name={copied === 'link' ? 'check' : 'copy'} />} onClick={() => void copy('link')}>
             Copy invite link
-          </Button>
+          </PaperButton>
           {typeof navigator.share === 'function' && (
-            <Button size="sm" variant="ghost" iconStart={<Icon name="external" />} onClick={() => void navigator.share({ title: 'Versus Court', text, url }).catch(() => undefined)}>
+            <PaperButton size="sm" variant="ghost" iconStart={<Icon name="external" />} onClick={() => void navigator.share({ title: 'Versus Court', text, url }).catch(() => undefined)}>
               Share…
-            </Button>
+            </PaperButton>
           )}
         </div>
         <p className={styles.linkText}>
@@ -60,9 +61,9 @@ export function InvitePanel({ c }: { c: VersusCase }) {
       <div className={styles.panelFooter}>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="sm">
+            <PaperButton variant="ghost" size="sm">
               Withdraw this invite
-            </Button>
+            </PaperButton>
           </DialogTrigger>
           <DialogContent
             title="Withdraw the invite?"
@@ -72,7 +73,7 @@ export function InvitePanel({ c }: { c: VersusCase }) {
             footer={
               <>
                 <DialogClose asChild>
-                  <Button variant="ghost">Keep waiting</Button>
+                  <PaperButton variant="ghost">Keep waiting</PaperButton>
                 </DialogClose>
                 <DialogClose asChild>
                   <Button variant="danger" onClick={() => void run(() => desk.withdraw(c.trialId, 'a'), { success: 'Invite withdrawn' })}>
@@ -84,6 +85,6 @@ export function InvitePanel({ c }: { c: VersusCase }) {
           />
         </Dialog>
       </div>
-    </OrnateFrame>
+    </PaperSection>
   );
 }

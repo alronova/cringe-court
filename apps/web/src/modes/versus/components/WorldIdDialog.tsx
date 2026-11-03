@@ -1,5 +1,5 @@
 import { useState, type ReactElement } from 'react';
-import { Badge, Button, Dialog, DialogContent, DialogTrigger, Icon } from '@/ds';
+import { Badge, Dialog, DialogContent, DialogTrigger, Icon, PaperButton } from '@/ds';
 import styles from '../versus.module.css';
 
 export interface WorldIdDialogProps {
@@ -29,10 +29,10 @@ export function WorldIdDialog({ title, purpose, confirmLabel, onVerified, trigge
         size="sm"
         footer={
           <>
-            <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
+            <PaperButton variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
               Cancel
-            </Button>
-            <Button
+            </PaperButton>
+            <PaperButton
               iconStart={<Icon name="check" />}
               loading={busy}
               onClick={async () => {
@@ -46,7 +46,7 @@ export function WorldIdDialog({ title, purpose, confirmLabel, onVerified, trigge
               }}
             >
               {confirmLabel}
-            </Button>
+            </PaperButton>
           </>
         }
       >

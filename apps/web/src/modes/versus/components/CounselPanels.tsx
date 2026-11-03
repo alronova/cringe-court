@@ -1,10 +1,11 @@
 import { formatUsdc, usdc, type SideId } from '@cringe-court/core';
 import { otherSide, sideCharges, sideStatus, type VersusCase } from '@cringe-court/modes-versus';
-import { Alert, Amount, Badge, Button, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, OrnateFrame, Portrait, Spinner, TestnetBadge } from '@/ds';
+import { Alert, Amount, Badge, Button, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, PaperButton, Portrait, Spinner, TestnetBadge } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
 import { WithdrawButton } from './BriefPanel';
 import { TrialView } from './TrialView';
+import { PaperSection } from './PaperSection';
 
 /** Both agents are writing. The clerk in any party tab runs the draft. */
 export function DraftingPanel({ c }: { c: VersusCase }) {
@@ -12,7 +13,7 @@ export function DraftingPanel({ c }: { c: VersusCase }) {
   const attempt = s.stage === 'counsel' ? s.attempt : 1;
   const redraft = s.stage === 'counsel' ? s.pendingRedraft : null;
   return (
-    <OrnateFrame as="section" padding="lg" tone="wood" aria-labelledby="drafting-title" className={styles.drafting}>
+    <PaperSection as="section" padding="lg" tone="maroon" aria-labelledby="drafting-title" className={styles.drafting}>
       <div className={styles.draftingStage} aria-hidden>
         <Portrait character="side-a" expression="smug" size="xl" ring="side-a" alt="" />
         <span className={styles.vs}>VS</span>
@@ -25,7 +26,7 @@ export function DraftingPanel({ c }: { c: VersusCase }) {
         <Spinner size="sm" label={null} /> Attempt {attempt}: same model, same token budget for both sides. A balance check runs before you see it.
       </p>
       <p className={styles.fine}>Each agent sees its own side’s notes and only the other side’s public story (D1).</p>
-    </OrnateFrame>
+    </PaperSection>
   );
 }
 
@@ -58,9 +59,9 @@ export function DraftReviewPanel({ c, side }: { c: VersusCase; side: SideId }) {
   const themStatus = sideStatus(c, them);
   return (
     <div className={styles.stack}>
-      <OrnateFrame as="section" padding="md" ribbon="The draft" aria-label="Draft trial">
+      <PaperSection as="section" padding="md" ribbon="The draft" aria-label="Draft trial">
         <TrialView lines={s.draft.lines} exhibits={s.exhibits} filing={s.filing} banner="Draft · frozen once both sides approve" />
-      </OrnateFrame>
+      </PaperSection>
       <section className={styles.reviewBar} aria-labelledby="approve-title">
         <div>
           <h2 id="approve-title" className={styles.panelSubtitle}>
@@ -80,9 +81,9 @@ export function DraftReviewPanel({ c, side }: { c: VersusCase; side: SideId }) {
             <>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="secondary" disabled={me.redraftsLeft === 0} iconStart={<Icon name="refresh" />}>
+                  <PaperButton variant="maroon" disabled={me.redraftsLeft === 0} iconStart={<Icon name="refresh" />}>
                     {me.redraftsLeft === 0 ? 'Redraft used' : 'Redraft my agent (1 left)'}
-                  </Button>
+                  </PaperButton>
                 </DialogTrigger>
                 <DialogContent
                   title={`Redraft Agent ${side.toUpperCase()}?`}
@@ -91,18 +92,18 @@ export function DraftReviewPanel({ c, side }: { c: VersusCase; side: SideId }) {
                   footer={
                     <>
                       <DialogClose asChild>
-                        <Button variant="ghost">Keep this draft</Button>
+                        <PaperButton variant="ghost">Keep this draft</PaperButton>
                       </DialogClose>
                       <DialogClose asChild>
-                        <Button onClick={() => void run(() => desk.requestRedraft(c.trialId, side), { success: `Agent ${side.toUpperCase()} is redrafting` })}>Redraft</Button>
+                        <PaperButton onClick={() => void run(() => desk.requestRedraft(c.trialId, side), { success: `Agent ${side.toUpperCase()} is redrafting` })}>Redraft</PaperButton>
                       </DialogClose>
                     </>
                   }
                 />
               </Dialog>
-              <Button size="lg" iconStart={<Icon name="check" />} onClick={() => void run(() => desk.approveDraft(c.trialId, side), { success: 'Draft approved' })}>
+              <PaperButton size="lg" iconStart={<Icon name="check" />} onClick={() => void run(() => desk.approveDraft(c.trialId, side), { success: 'Draft approved' })}>
                 Approve the draft
-              </Button>
+              </PaperButton>
             </>
           )}
         </div>
@@ -124,7 +125,7 @@ export function FundingPanel({ c, side }: { c: VersusCase; side: SideId }) {
   const themStatus = sideStatus(c, them);
   const short = balance < mine.total;
   return (
-    <OrnateFrame as="section" padding="lg" ribbon="Pay your half" aria-labelledby="fund-title">
+    <PaperSection as="section" padding="lg" ribbon="Pay your half" aria-labelledby="fund-title">
       <div className={styles.fundGrid}>
         <div>
           <h2 id="fund-title" className={styles.panelTitle}>
@@ -179,9 +180,9 @@ export function FundingPanel({ c, side }: { c: VersusCase; side: SideId }) {
             Demo wallet: <Amount value={balance} size="sm" />
           </p>
           {short && (
-            <Button variant="secondary" iconStart={<Icon name="plus" />} onClick={() => void run(() => desk.faucet(usdc('5.00')), { success: 'Added 5.00 test USDC' })}>
+            <PaperButton variant="maroon" iconStart={<Icon name="plus" />} onClick={() => void run(() => desk.faucet(usdc('5.00')), { success: 'Added 5.00 test USDC' })}>
               Get test USDC
-            </Button>
+            </PaperButton>
           )}
           <Button size="lg" variant="swear" disabled={short} iconStart={<Icon name="scales" />} onClick={() => void run(() => desk.fund(c.trialId), { success: `Paid ${formatUsdc(mine.total)} (test USDC)` })}>
             Pay {formatUsdc(mine.total)}
@@ -192,6 +193,6 @@ export function FundingPanel({ c, side }: { c: VersusCase; side: SideId }) {
       <div className={styles.panelFooter}>
         <WithdrawButton c={c} side={side} paid={me.paid} />
       </div>
-    </OrnateFrame>
+    </PaperSection>
   );
 }

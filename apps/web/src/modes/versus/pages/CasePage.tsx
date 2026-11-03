@@ -2,7 +2,7 @@ import { viewerOf } from '@cringe-court/modes-versus';
 import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 import { useDocumentTitle } from '@/app/useDocumentTitle';
-import { ButtonLink, EmptyState, ErrorState, LoadingState } from '@/ds';
+import { EmptyState, ErrorState, LoadingState, PaperButtonLink } from '@/ds';
 import { CaseHeader } from '../components/CaseHeader';
 import { CaseRail } from '../components/CaseRail';
 import { StagePanel } from '../components/StagePanel';
@@ -52,10 +52,10 @@ export function CasePage() {
           headingLevel={1}
           actions={
             <>
-              <ButtonLink to={versusPaths.cases}>My cases</ButtonLink>
-              <ButtonLink to={versusPaths.newCase} variant="secondary">
+              <PaperButtonLink to={versusPaths.cases}>My cases</PaperButtonLink>
+              <PaperButtonLink to={versusPaths.newCase} variant="maroon">
                 Start a case
-              </ButtonLink>
+              </PaperButtonLink>
             </>
           }
         >

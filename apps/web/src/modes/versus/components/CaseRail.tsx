@@ -13,7 +13,7 @@ import {
   type Viewer,
 } from '@cringe-court/modes-versus';
 import { useMemo, useState } from 'react';
-import { Amount, Badge, Button, Card, CardBody, CardHeader, CardTitle, Icon, Portrait, RadioCards, TestnetBadge } from '@/ds';
+import { Amount, Badge, Card, CardBody, CardHeader, CardTitle, Icon, PaperButton, Portrait, RadioCards, TestnetBadge } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
 
@@ -166,15 +166,15 @@ function DemoControls({ c }: { c: VersusCase }) {
                 { value: 'two-no-shows', label: 'Two no-shows', description: 'Likely MISTRIAL with full refunds' },
               ]}
             />
-            <Button variant="secondary" fullWidth iconStart={<Icon name="user" />} onClick={() => void run(() => desk.seatDemoJurors(c.trialId, plan), { success: 'Simulated jurors took the empty seats' })}>
+            <PaperButton variant="maroon" fullWidth iconStart={<Icon name="user" />} onClick={() => void run(() => desk.seatDemoJurors(c.trialId, plan), { success: 'Simulated jurors took the empty seats' })}>
               Seat simulated jurors
-            </Button>
+            </PaperButton>
           </>
         )}
         {canSkip && (
-          <Button variant="ghost" fullWidth iconStart={<Icon name="clock" />} onClick={() => void run(() => desk.skipAhead(c.trialId))}>
+          <PaperButton variant="ghost" fullWidth iconStart={<Icon name="clock" />} onClick={() => void run(() => desk.skipAhead(c.trialId))}>
             Skip to the deadline
-          </Button>
+          </PaperButton>
         )}
       </CardBody>
     </Card>

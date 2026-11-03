@@ -1,7 +1,7 @@
 import { createAudioEngine } from '@cringe-court/audio';
 import { usdc } from '@cringe-court/core';
 import { ManualClock, MemorySaltVault, MockIdentity, testAddress } from '@cringe-court/core/testing';
-import { MemoryFactStore, VersusCounsel, VersusDesk, prepareBriefing, type Persona } from '@cringe-court/modes-versus';
+import { MemoryFactStore, VersusCounsel, VersusDesk, makeInviteCode, prepareBriefing, type Persona } from '@cringe-court/modes-versus';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactElement } from 'react';
@@ -68,6 +68,14 @@ const briefB = prepareBriefing({
 
 type Court = ReturnType<typeof court>;
 
+/** A well-formed invite code (valid check character) that is not `taken`. */
+function validCodeOtherThan(taken: string): string {
+  for (let seed = 1; ; seed++) {
+    const code = makeInviteCode(() => (seed * 0.137) % 1);
+    if (code !== taken) return code;
+  }
+}
+
 async function filed(t: Court) {
   return t.a.fileCase({ title: 'The Last Dumpling', category: 'npc-behavior', patch: briefA.patch });
 }
@@ -112,9 +120,9 @@ async function toVerdict(t: Court) {
   return ids;
 }
 
-/** The stage panel under an ornate ribbon ("Pay your half", "Jury selection", …). */
+/** The paper section under a ribbon ("Pay your half", "Jury selection", …). */
 async function panel(ribbon: string): Promise<HTMLElement> {
-  const label = await screen.findByText(ribbon, { selector: 'p' });
+  const label = await screen.findByText(ribbon);
   return label.closest('section') as HTMLElement;
 }
 
@@ -160,8 +168,8 @@ describe('Versus: invite and join', () => {
 
   it('shows an empty state for a well-formed code that matches no case', async () => {
     const t = court();
-    await filed(t);
-    t.view('bob', '/versus/join/ABCD-EFGH');
+    const { code } = await filed(t);
+    t.view('bob', `/versus/join/${validCodeOtherThan(code)}`);
     expect(await screen.findByText('No case with that code here')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Try another code' })).toHaveAttribute('href', '/versus/join');
   });
@@ -227,7 +235,7 @@ describe('Versus: the case room', () => {
     const user = userEvent.setup();
     const { container } = t.view('alice', `/versus/case/${trialId}`);
     const pay = await panel('Pay your half');
-    expect(within(pay).getAllByText(/1\.40/).length).toBeGreaterThan(0);
+    expect(within(pay).getAllByText(/0\.70/).length).toBeGreaterThan(0);
     expect(await axe(container, AXE)).toHaveNoViolations();
     await user.click(within(pay).getByRole('button', { name: /Pay/ }));
     await waitFor(async () => expect((await t.a.world()).case(trialId)?.state).toMatchObject({ stage: 'counsel' }));
@@ -253,8 +261,8 @@ describe('Versus: the case room', () => {
     // The trial view and its transcript are always there for the jury.
     expect(within(session).getAllByText(/Napkin Knight|Side A/).length).toBeGreaterThan(0);
     expect(await axe(container, AXE)).toHaveNoViolations();
-    await user.click(within(session).getAllByRole('radio')[0]!);
-    await user.click(within(session).getByRole('button', { name: /Seal/ }));
+    await user.click(screen.getAllByRole('radio')[0]!);
+    await user.click(screen.getByRole('button', { name: /Seal/ }));
     expect(await screen.findByText('Your scroll is sealed')).toBeInTheDocument();
     expect(await t.j.sealedChoice(trialId)).toBe(0);
   });

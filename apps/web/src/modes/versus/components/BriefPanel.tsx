@@ -1,11 +1,12 @@
 import type { Exhibit, SideId } from '@cringe-court/core';
 import { EMPTY_BRIEFING, EXHIBITS_PER_SIDE, otherSide, prepareBriefing, sideLabel, sideStatus, versusMode, visibleBrief, type BriefingDraft, type VersusCase } from '@cringe-court/modes-versus';
 import { useState } from 'react';
-import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, OrnateFrame, Portrait, Select, TextArea, TextField } from '@/ds';
+import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, PaperButton, Portrait, Select, TextArea, TextField } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
 import { BriefReview } from './BriefReview';
 import { BriefingChat } from './BriefingChat';
+import { PaperSection } from './PaperSection';
 
 function draftFromFiling(c: VersusCase, side: SideId): BriefingDraft {
   const f = c.state.filing.sides[side];
@@ -32,9 +33,9 @@ export function BriefPanel({ c, side }: { c: VersusCase; side: SideId }) {
 
   if (chatting) {
     return (
-      <OrnateFrame as="section" padding="lg" aria-label="Brief your agent">
+      <PaperSection as="section" padding="lg" aria-label="Brief your agent">
         <BriefingChat side={side} category={c.state.filing.category} trialId={c.trialId} value={draft} onChange={setDraft} onDone={() => setChatting(false)} />
-      </OrnateFrame>
+      </PaperSection>
     );
   }
 
@@ -42,7 +43,7 @@ export function BriefPanel({ c, side }: { c: VersusCase; side: SideId }) {
 
   return (
     <div className={styles.stack}>
-      <OrnateFrame as="section" padding="lg" ribbon={`Your brief · ${sideLabel(side, c.state.filing.sides[side])}`} aria-label="Your brief">
+      <PaperSection as="section" padding="lg" ribbon={`Your brief · ${sideLabel(side, c.state.filing.sides[side])}`} ribbonAs="h2" aria-label="Your brief">
         <BriefReview
           side={side}
           value={draft}
@@ -50,29 +51,29 @@ export function BriefPanel({ c, side }: { c: VersusCase; side: SideId }) {
           rules={versusMode.rules}
           actions={(ready) =>
             dirty || !me.briefed ? (
-              <Button disabled={!ready} iconStart={<Icon name="check" />} onClick={() => void save()}>
+              <PaperButton disabled={!ready} iconStart={<Icon name="check" />} onClick={() => void save()}>
                 {me.briefed ? 'Save changes' : 'Save my brief'}
-              </Button>
+              </PaperButton>
             ) : me.approvedBrief ? (
               <Badge tone="success" dot>
                 You approved this brief
               </Badge>
             ) : (
-              <Button
+              <PaperButton
                 size="lg"
                 disabled={!ready || !themStatus.briefed}
                 iconStart={<Icon name="gavel" />}
                 onClick={() => void run(() => desk.approveBrief(c.trialId, side), { success: 'Approved. Your agent will argue exactly this.' })}
               >
                 Approve my brief
-              </Button>
+              </PaperButton>
             )
           }
         />
         {!dirty && me.briefed && !me.approvedBrief && !themStatus.briefed && (
           <p className={styles.fine}>You can approve once Side {them.toUpperCase()} has briefed their agent, so you read their public story first.</p>
         )}
-      </OrnateFrame>
+      </PaperSection>
 
       <ExhibitsCard c={c} side={side} />
 
@@ -139,9 +140,9 @@ function ExhibitsCard({ c, side }: { c: VersusCase; side: SideId }) {
                   <p className={styles.exhibitBody}>{x.body}</p>
                 </div>
                 {x.submittedBy === side && (
-                  <Button size="sm" variant="ghost" onClick={() => void run(() => desk.removeExhibit(c.trialId, side, x.id))} aria-label={`Remove exhibit ${x.title}`}>
+                  <PaperButton size="sm" variant="ghost" onClick={() => void run(() => desk.removeExhibit(c.trialId, side, x.id))} aria-label={`Remove exhibit ${x.title}`}>
                     Remove
-                  </Button>
+                  </PaperButton>
                 )}
               </li>
             ))}
@@ -181,9 +182,9 @@ function ExhibitsCard({ c, side }: { c: VersusCase; side: SideId }) {
             />
             <TextArea label="What it shows" rows={2} maxLength={280} value={body} onChange={(e) => setBody(e.target.value)} placeholder="me: splitting it 50/50 ok?  them: deal" error={touched && !body.trim() ? 'Describe the exhibit' : undefined} />
             <div className={styles.formActions}>
-              <Button type="submit" variant="secondary" iconStart={<Icon name="plus" />}>
+              <PaperButton type="submit" variant="maroon" iconStart={<Icon name="plus" />}>
                 Add exhibit
-              </Button>
+              </PaperButton>
             </div>
           </form>
         )}
@@ -197,9 +198,9 @@ export function WithdrawButton({ c, side, paid = false }: { c: VersusCase; side:
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <PaperButton variant="ghost" size="sm">
           Withdraw consent
-        </Button>
+        </PaperButton>
       </DialogTrigger>
       <DialogContent
         title="Withdraw from this case?"
@@ -213,7 +214,7 @@ export function WithdrawButton({ c, side, paid = false }: { c: VersusCase; side:
         footer={
           <>
             <DialogClose asChild>
-              <Button variant="ghost">Stay in</Button>
+              <PaperButton variant="ghost">Stay in</PaperButton>
             </DialogClose>
             <DialogClose asChild>
               <Button variant="danger" onClick={() => void run(() => desk.withdraw(c.trialId, side), { success: 'You withdrew. The case is closed.' })}>

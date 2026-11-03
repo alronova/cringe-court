@@ -1,10 +1,11 @@
 import { CANCEL_LABELS, ZERO_USDC, addUsdc, formatUsdc } from '@cringe-court/core';
 import { claimable, type VersusCase, type Viewer } from '@cringe-court/modes-versus';
-import { ButtonLink, Icon, OrnateFrame, Stamp } from '@/ds';
+import { Icon, PaperButtonLink, Stamp } from '@/ds';
 import { versusPaths } from '../mode';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
 import { ClaimCard } from './VerdictPanel';
+import { PaperSection } from './PaperSection';
 
 const WHY: Partial<Record<string, string>> = {
   'consent-missed': 'Invites expire with the consent window. Side A paid nothing; the platform absorbed the AI intake (D6).',
@@ -28,7 +29,7 @@ export function DismissedPanel({ c, viewer }: { c: VersusCase; viewer: Viewer })
   const mine = claimable(c, persona.account);
   return (
     <div className={styles.stack}>
-      <OrnateFrame as="section" padding="lg" aria-labelledby="dismissed-title" className={styles.dismissed}>
+      <PaperSection as="section" padding="lg" aria-labelledby="dismissed-title" className={styles.dismissed}>
         <Stamp tone="no-verdict" size="lg" animate sub={total > 0n ? 'Full refunds' : 'Nothing charged'}>
           Case dismissed
         </Stamp>
@@ -48,12 +49,12 @@ export function DismissedPanel({ c, viewer }: { c: VersusCase; viewer: Viewer })
           </p>
         )}
         <div className={styles.inlineActions}>
-          <ButtonLink to={versusPaths.newCase}>Start a new case</ButtonLink>
-          <ButtonLink to={versusPaths.cases} variant="ghost">
+          <PaperButtonLink to={versusPaths.newCase}>Start a new case</PaperButtonLink>
+          <PaperButtonLink to={versusPaths.cases} variant="ghost">
             My cases
-          </ButtonLink>
+          </PaperButtonLink>
         </div>
-      </OrnateFrame>
+      </PaperSection>
       <ClaimCard c={c} caseNumber={s.caseNumber} />
     </div>
   );

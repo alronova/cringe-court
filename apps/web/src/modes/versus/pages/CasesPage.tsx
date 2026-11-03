@@ -2,7 +2,7 @@ import { CATEGORIES, formatCaseNumber, formatUsdc } from '@cringe-court/core';
 import { VERSUS_STEPS, casesFor, jurorStake, nextStep, stepIndex, viewerOf, type VersusCase } from '@cringe-court/modes-versus';
 import { Link } from 'react-router';
 import { useDocumentTitle } from '@/app/useDocumentTitle';
-import { Badge, ButtonLink, EmptyState, Icon, LoadingState, Portrait, Skeleton } from '@/ds';
+import { Badge, EmptyState, Icon, LoadingState, PaperButtonLink, Portrait, Skeleton } from '@/ds';
 import { PageHead } from '../components/PageHead';
 import { versusPaths } from '../mode';
 import { useVersus } from '../runtime/context';
@@ -69,9 +69,9 @@ export function CasesPage() {
         title="My cases"
         lede="Every case this persona is part of, in this browser’s demo court."
         aside={
-          <ButtonLink to={versusPaths.newCase} size="lg" iconStart={<Icon name="gavel" />}>
+          <PaperButtonLink to={versusPaths.newCase} size="lg" iconStart={<Icon name="gavel" />}>
             Start a case
-          </ButtonLink>
+          </PaperButtonLink>
         }
       />
       <div className={styles.page}>
@@ -83,10 +83,10 @@ export function CasesPage() {
             headingLevel={2}
             actions={
               <>
-                <ButtonLink to={versusPaths.newCase}>Start a Versus case</ButtonLink>
-                <ButtonLink to={versusPaths.join} variant="secondary">
+                <PaperButtonLink to={versusPaths.newCase}>Start a Versus case</PaperButtonLink>
+                <PaperButtonLink to={versusPaths.join} variant="maroon">
                   I have an invite code
-                </ButtonLink>
+                </PaperButtonLink>
               </>
             }
           >

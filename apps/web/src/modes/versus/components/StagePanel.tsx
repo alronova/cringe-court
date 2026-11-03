@@ -1,5 +1,5 @@
 import type { VersusCase, Viewer } from '@cringe-court/modes-versus';
-import { ButtonLink, EmptyState } from '@/ds';
+import { EmptyState, PaperButtonLink } from '@/ds';
 import { versusPaths } from '../mode';
 import { BriefPanel } from './BriefPanel';
 import { DraftingPanel, DraftReviewPanel, FundingPanel } from './CounselPanels';
@@ -17,7 +17,7 @@ export function StagePanel({ c, viewer }: { c: VersusCase; viewer: Viewer }) {
       if (viewer === 'a') return <InvitePanel c={c} />;
       if (viewer === 'invitee')
         return (
-          <EmptyState title="You have been invited to this case" character="side-a" expression="smug" actions={<ButtonLink to={versusPaths.joinCode(c.code)}>Read the invite</ButtonLink>}>
+          <EmptyState title="You have been invited to this case" character="side-a" expression="smug" actions={<PaperButtonLink to={versusPaths.joinCode(c.code)}>Read the invite</PaperButtonLink>}>
             Read what you are agreeing to, then accept or decline.
           </EmptyState>
         );

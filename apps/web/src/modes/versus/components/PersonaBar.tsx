@@ -1,6 +1,6 @@
 import { usdc } from '@cringe-court/core';
 import { Link } from 'react-router';
-import { Amount, Badge, Button, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, Switch, TestnetBadge } from '@/ds';
+import { Amount, Badge, Button, Dialog, DialogClose, DialogContent, DialogTrigger, Icon, PaperButton, Switch, TestnetBadge } from '@/ds';
 import { versusPaths } from '../mode';
 import { shortAccount } from '../runtime/personas';
 import { useAudioSnapshot, useVersus } from '../runtime/context';
@@ -30,9 +30,9 @@ export function PersonaBar() {
             <span className="cc-visually-hidden">Demo wallet balance:</span>
             <Amount value={balance} size="sm" />
           </span>
-          <Button size="sm" variant="ghost" iconStart={<Icon name="plus" />} onClick={() => void run(() => desk.faucet(usdc('5.00')), { success: 'Added 5.00 test USDC to this demo wallet' })}>
+          <PaperButton size="sm" variant="ghost" iconStart={<Icon name="plus" />} onClick={() => void run(() => desk.faucet(usdc('5.00')), { success: 'Added 5.00 test USDC to this demo wallet' })}>
             Test USDC
-          </Button>
+          </PaperButton>
         </div>
         <div className={styles.personaActions}>
           <Link to={versusPaths.cases} className={styles.personaLink}>
@@ -49,9 +49,9 @@ export function PersonaBar() {
           />
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" variant="secondary" iconStart={<Icon name="refresh" />}>
+              <PaperButton size="sm" variant="maroon" iconStart={<Icon name="refresh" />}>
                 Switch persona
-              </Button>
+              </PaperButton>
             </DialogTrigger>
             <DialogContent
               title="Who are you in this tab?"
@@ -59,12 +59,12 @@ export function PersonaBar() {
               footer={
                 <>
                   <DialogClose asChild>
-                    <Button variant="ghost" onClick={newPersona}>
+                    <PaperButton variant="ghost" onClick={newPersona}>
                       New persona
-                    </Button>
+                    </PaperButton>
                   </DialogClose>
                   <DialogClose asChild>
-                    <Button variant="secondary">Done</Button>
+                    <PaperButton variant="maroon">Done</PaperButton>
                   </DialogClose>
                 </>
               }

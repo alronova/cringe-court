@@ -3,7 +3,7 @@ import { EMPTY_BRIEFING, OPEN_INVITE_LIMIT, prepareBriefing, sideCharges, versus
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useDocumentTitle } from '@/app/useDocumentTitle';
-import { Alert, Button, Icon, OrnateFrame, PhaseStepper, RadioCards, TextField } from '@/ds';
+import { Alert, Icon, PaperButton, PhaseStepper, RadioCards, TextField } from '@/ds';
 import { BriefReview } from '../components/BriefReview';
 import { BriefingChat } from '../components/BriefingChat';
 import { PageHead } from '../components/PageHead';
@@ -11,6 +11,7 @@ import { WorldIdDialog } from '../components/WorldIdDialog';
 import { versusPaths } from '../mode';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
+import { PaperSection } from '../components/PaperSection';
 
 const DRAFT_KEY = 'cc:versus:new-case';
 
@@ -89,7 +90,7 @@ export function NewCasePage() {
         )}
 
         {draft.step === 0 && (
-          <OrnateFrame as="section" padding="lg" ribbon="The case" aria-label="The case">
+          <PaperSection as="section" padding="lg" ribbon="The case" ribbonAs="h2" aria-label="The case">
             <form
               className={styles.form}
               onSubmit={(e) => {
@@ -116,27 +117,27 @@ export function NewCasePage() {
                 </p>
               </div>
               <div className={styles.formActions}>
-                <Button type="submit" size="lg" iconEnd={<Icon name="arrow-right" />} disabled={atLimit}>
+                <PaperButton type="submit" size="lg" iconEnd={<Icon name="arrow-right" />} disabled={atLimit}>
                   Brief Agent A
-                </Button>
+                </PaperButton>
               </div>
             </form>
-          </OrnateFrame>
+          </PaperSection>
         )}
 
         {draft.step === 1 && (
-          <OrnateFrame as="section" padding="lg" aria-label="Briefing">
+          <PaperSection as="section" padding="lg" aria-label="Briefing">
             <BriefingChat side="a" category={(draft.category || 'npc-behavior') as Category} trialId={`draft-${persona.id}`} value={draft.brief} onChange={(brief) => set({ brief })} onDone={() => set({ step: 2 })} />
             <div className={styles.backRow}>
-              <Button variant="ghost" size="sm" iconStart={<Icon name="arrow-left" />} onClick={() => set({ step: 0 })}>
+              <PaperButton variant="ghost" size="sm" iconStart={<Icon name="arrow-left" />} onClick={() => set({ step: 0 })}>
                 Change the case details
-              </Button>
+              </PaperButton>
             </div>
-          </OrnateFrame>
+          </PaperSection>
         )}
 
         {draft.step === 2 && (
-          <OrnateFrame as="section" padding="lg" ribbon="Review & invite" aria-label="Review and invite">
+          <PaperSection as="section" padding="lg" ribbon="Review & invite" ribbonAs="h2" aria-label="Review and invite">
             <p className={styles.caseLine}>
               <span className={styles.caseLineTitle}>“{draft.title}”</span> · {draft.category ? CATEGORIES[draft.category] : ''}
             </p>
@@ -147,24 +148,24 @@ export function NewCasePage() {
               rules={versusMode.rules}
               actions={(ready) => (
                 <>
-                  <Button variant="secondary" onClick={() => set({ step: 1 })}>
+                  <PaperButton variant="maroon" onClick={() => set({ step: 1 })}>
                     Back to the briefing
-                  </Button>
+                  </PaperButton>
                   <WorldIdDialog
                     title="Prove you are a unique human"
                     purpose="One human, one side. The same proof keeps you off this case’s jury, even with another wallet."
                     confirmLabel="Verify & file"
                     onVerified={file}
                     trigger={
-                      <Button size="lg" iconStart={<Icon name="gavel" />} disabled={!ready || atLimit} loading={filing}>
+                      <PaperButton size="lg" iconStart={<Icon name="gavel" />} disabled={!ready || atLimit} loading={filing}>
                         File & get invite
-                      </Button>
+                      </PaperButton>
                     }
                   />
                 </>
               )}
             />
-          </OrnateFrame>
+          </PaperSection>
         )}
       </div>
     </>

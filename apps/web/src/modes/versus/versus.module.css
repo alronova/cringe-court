@@ -1472,3 +1472,19 @@
   height: 1.25rem;
   color: var(--cc-color-text-subtle);
 }
+
+/* ── Paper sections (PaperSection): a ribbon pinned across the top edge of a sheet ── */
+.paperSection {
+  position: relative;
+}
+
+.paperSectionRibboned {
+  margin-top: var(--cc-space-5);
+}
+
+.sectionRibbon {
+  display: flex;
+  width: fit-content;
+  max-width: calc(100% - var(--cc-space-6));
+  margin: calc(-1 * var(--cc-space-8)) auto var(--cc-space-4);
+}

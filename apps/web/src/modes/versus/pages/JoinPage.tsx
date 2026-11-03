@@ -3,12 +3,13 @@ import { parseInviteCode, sideCharges, viewerOf } from '@cringe-court/modes-vers
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useDocumentTitle } from '@/app/useDocumentTitle';
-import { Alert, Button, ButtonLink, Countdown, Dialog, DialogClose, DialogContent, DialogTrigger, EmptyState, Icon, LoadingState, OrnateFrame, Portrait, Stamp, TextField } from '@/ds';
+import { Alert, Button, Countdown, Dialog, DialogClose, DialogContent, DialogTrigger, EmptyState, Icon, LoadingState, PaperButton, PaperButtonLink, Portrait, Stamp, TextField } from '@/ds';
 import { PageHead } from '../components/PageHead';
 import { WorldIdDialog } from '../components/WorldIdDialog';
 import { versusPaths } from '../mode';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
+import { PaperSection } from '../components/PaperSection';
 
 function CodeForm({ initial = '', error }: { initial?: string; error?: string }) {
   const navigate = useNavigate();
@@ -38,9 +39,9 @@ function CodeForm({ initial = '', error }: { initial?: string; error?: string })
         spellCheck={false}
         className={styles.codeField}
       />
-      <Button type="submit" size="lg" iconEnd={<Icon name="arrow-right" />}>
+      <PaperButton type="submit" size="lg" iconEnd={<Icon name="arrow-right" />}>
         Open invite
-      </Button>
+      </PaperButton>
     </form>
   );
 }
@@ -57,9 +58,9 @@ export function JoinPage() {
       <>
         <PageHead eyebrow="Versus Court · invite" title="Someone took you to court" lede="Enter the code from your invite. You will see what you are agreeing to before anything is shared or charged." />
         <div className={styles.page}>
-          <OrnateFrame padding="lg" className={styles.narrow}>
+          <PaperSection as="div" padding="lg" className={styles.narrow}>
             <CodeForm />
-          </OrnateFrame>
+          </PaperSection>
         </div>
       </>
     );
@@ -72,9 +73,9 @@ export function JoinPage() {
       <>
         {head}
         <div className={styles.page}>
-          <OrnateFrame padding="lg" className={styles.narrow}>
+          <PaperSection as="div" padding="lg" className={styles.narrow}>
             <CodeForm initial={raw} error={parsed.message} />
-          </OrnateFrame>
+          </PaperSection>
         </div>
       </>
     );
@@ -101,9 +102,9 @@ export function JoinPage() {
             character="clerk"
             expression="shocked"
             actions={
-              <ButtonLink to={versusPaths.join} variant="secondary">
+              <PaperButtonLink to={versusPaths.join} variant="maroon">
                 Try another code
-              </ButtonLink>
+              </PaperButtonLink>
             }
           >
             The demo court lives in this browser, so the invite only works in a tab of the same browser that filed it. Check the code, or ask Side A to open the invite here.
@@ -125,7 +126,7 @@ export function JoinPage() {
           <EmptyState
             title={viewer === 'a' ? 'This is your own invite' : 'You already joined this case'}
             character={viewer === 'a' ? 'side-a' : 'side-b'}
-            actions={<ButtonLink to={versusPaths.case(c.trialId)}>Open the case</ButtonLink>}
+            actions={<PaperButtonLink to={versusPaths.case(c.trialId)}>Open the case</PaperButtonLink>}
           >
             {viewer === 'a'
               ? 'Send the link or code to the other side. To try it yourself, open the link in a new tab: each tab is a separate demo persona.'
@@ -147,9 +148,9 @@ export function JoinPage() {
             character="judge"
             expression="neutral"
             actions={
-              <ButtonLink to={versusPaths.cases} variant="secondary">
+              <PaperButtonLink to={versusPaths.cases} variant="maroon">
                 My cases
-              </ButtonLink>
+              </PaperButtonLink>
             }
           >
             {closed ? `${CANCEL_LABELS[s.reason]}. Nobody was charged.` : 'Each case has exactly two sides. If you are one of them, switch to that persona in the bar above.'}
@@ -165,7 +166,7 @@ export function JoinPage() {
     <>
       {head}
       <div className={styles.page}>
-        <OrnateFrame as="article" padding="lg" ribbon="Summons" className={styles.summons} aria-labelledby="summons-title">
+        <PaperSection as="article" padding="lg" ribbon="Summons" className={styles.summons} aria-labelledby="summons-title">
           <div className={styles.summonsTop}>
             <Portrait character="side-a" expression="smug" size="lg" ring="side-a" alt="Side A" />
             <div>
@@ -216,7 +217,7 @@ export function JoinPage() {
           <div className={styles.summonsActions}>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="ghost">Decline</Button>
+                <PaperButton variant="ghost">Decline</PaperButton>
               </DialogTrigger>
               <DialogContent
                 title="Decline the invite?"
@@ -225,7 +226,7 @@ export function JoinPage() {
                 footer={
                   <>
                     <DialogClose asChild>
-                      <Button variant="ghost">Keep it open</Button>
+                      <PaperButton variant="ghost">Keep it open</PaperButton>
                     </DialogClose>
                     <DialogClose asChild>
                       <Button variant="danger" onClick={() => void run(() => desk.declineInvite(c.trialId), { success: 'Invite declined. Nobody was charged.' })}>
@@ -245,16 +246,16 @@ export function JoinPage() {
                 if (ok) navigate(versusPaths.case(c.trialId));
               }}
               trigger={
-                <Button size="lg" iconStart={<Icon name="gavel" />}>
+                <PaperButton size="lg" iconStart={<Icon name="gavel" />}>
                   Accept & become Side B
-                </Button>
+                </PaperButton>
               }
             />
           </div>
           <p className={styles.fine}>
             Not you? <Link to={versusPaths.landing}>Read how Versus works</Link>.
           </p>
-        </OrnateFrame>
+        </PaperSection>
       </div>
     </>
   );

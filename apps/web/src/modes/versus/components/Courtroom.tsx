@@ -3,7 +3,7 @@ import { sideLabel } from '@cringe-court/modes-versus';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { stagePose } from '@/art/art';
 import { guideArt } from '@/art/art';
-import { Button, DialogueBox, Icon, ImpactText, Stamp, cx, useReducedMotion, type ImpactKind } from '@/ds';
+import { cx, DialogueBox, Icon, type ImpactKind, ImpactText, PaperButton, Stamp, useReducedMotion } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from './Courtroom.module.css';
 
@@ -173,12 +173,12 @@ export function Courtroom({ lines, exhibits, filing, seats = [], jurySize = 3, v
       </div>
 
       <div className={styles.controls}>
-        <Button size="sm" variant="ghost" iconStart={<Icon name="arrow-left" />} onClick={() => go(index - 1)} disabled={index === 0}>
+        <PaperButton size="sm" variant="ghost" iconStart={<Icon name="arrow-left" />} onClick={() => go(index - 1)} disabled={index === 0}>
           Back
-        </Button>
-        <Button
+        </PaperButton>
+        <PaperButton
           size="sm"
-          variant={isPlaying ? 'secondary' : 'primary'}
+          variant={isPlaying ? 'maroon' : 'gold'}
           onClick={() => {
             if (!isPlaying && last) go(0);
             setPlaying(!isPlaying);
@@ -186,10 +186,10 @@ export function Courtroom({ lines, exhibits, filing, seats = [], jurySize = 3, v
           aria-pressed={isPlaying}
         >
           {isPlaying ? 'Pause' : last ? 'Replay trial' : index === 0 ? 'Play the trial' : 'Resume'}
-        </Button>
-        <Button size="sm" variant="ghost" iconEnd={<Icon name="arrow-right" />} onClick={() => go(index + 1)} disabled={last}>
+        </PaperButton>
+        <PaperButton size="sm" variant="ghost" iconEnd={<Icon name="arrow-right" />} onClick={() => go(index + 1)} disabled={last}>
           Next line
-        </Button>
+        </PaperButton>
         <span className={styles.progress} aria-live="off">
           Line {index + 1} of {lines.length}
         </span>

@@ -1,7 +1,7 @@
 import type { SideId, TrialRules } from '@cringe-court/core';
 import { BRIEFING_QUESTIONS, ROUTE_OUT_COPY, briefingIssues, describeHits, prepareBriefing, type BriefingDraft } from '@cringe-court/modes-versus';
 import { useMemo, useState, type ReactNode } from 'react';
-import { Alert, Badge, Button, Icon, TextArea, TextField } from '@/ds';
+import { Alert, Badge, Icon, PaperButton, TextArea, TextField } from '@/ds';
 import styles from './Briefing.module.css';
 
 export interface BriefReviewProps {
@@ -112,9 +112,9 @@ export function BriefReview({ side, value, onChange, rules, actions, startInEdit
       )}
 
       <div className={styles.reviewActions}>
-        <Button variant="ghost" iconStart={<Icon name={editing ? 'check' : 'document'} />} onClick={() => setEditing(!editing)}>
+        <PaperButton variant="ghost" iconStart={<Icon name={editing ? 'check' : 'document'} />} onClick={() => setEditing(!editing)}>
           {editing ? 'Preview' : 'Edit brief'}
-        </Button>
+        </PaperButton>
         {actions(ready)}
       </div>
     </div>

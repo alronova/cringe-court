@@ -1,6 +1,6 @@
 import { shareCardModel, shareCardSvg, shareText, type ShareTheme, type VersusCase } from '@cringe-court/modes-versus';
 import { useMemo } from 'react';
-import { Button, Card, CardBody, CardHeader, CardTitle, Icon, Stamp, useToast } from '@/ds';
+import { Card, CardBody, CardHeader, CardTitle, Icon, PaperButton, Stamp, useToast } from '@/ds';
 import { palette } from '@/ds/tokens';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
@@ -95,7 +95,7 @@ export function ShareCard({ c }: { c: VersusCase }) {
           <figcaption className="cc-visually-hidden">Share card preview</figcaption>
         </figure>
         <div className={styles.inlineActions}>
-          <Button
+          <PaperButton
             iconStart={<Icon name="copy" />}
             onClick={() =>
               void navigator.clipboard.writeText(text).then(
@@ -108,31 +108,31 @@ export function ShareCard({ c }: { c: VersusCase }) {
             }
           >
             Copy post
-          </Button>
-          <Button
-            variant="secondary"
-            iconStart={<Icon name="document" />}
-            onClick={() =>
-              void svgToPng(shareCardSvg(model, THEME))
-                .then((png) => {
-                  download(png, file);
-                  record('image');
-                })
-                .catch(() => {
-                  download(new Blob([shareCardSvg(model, THEME)], { type: 'image/svg+xml' }), file.replace('.png', '.svg'));
-                  record('image');
-                })
-            }
-          >
+          </PaperButton>
+          <PaperButton
+      variant="maroon"
+      iconStart={<Icon name="document" />}
+      onClick={() =>
+       void svgToPng(shareCardSvg(model, THEME))
+        .then((png) => {
+         download(png, file);
+         record('image');
+        })
+        .catch(() => {
+         download(new Blob([shareCardSvg(model, THEME)], { type: 'image/svg+xml' }), file.replace('.png', '.svg'));
+         record('image');
+        })
+      }
+     >
             Download image
-          </Button>
+          </PaperButton>
           <a className={styles.xLink} href={`https://x.com/intent/post?text=${encodeURIComponent(text)}`} target="_blank" rel="noopener noreferrer" onClick={() => record('x')}>
             <Icon name="external" aria-hidden /> Post on X<span className="cc-visually-hidden"> (opens in a new tab)</span>
           </a>
           {typeof navigator.share === 'function' && (
-            <Button variant="ghost" iconStart={<Icon name="external" />} onClick={() => void navigator.share({ title: model.caseLabel, text, url }).then(() => record('native'), () => undefined)}>
+            <PaperButton variant="ghost" iconStart={<Icon name="external" />} onClick={() => void navigator.share({ title: model.caseLabel, text, url }).then(() => record('native'), () => undefined)}>
               Share…
-            </Button>
+            </PaperButton>
           )}
         </div>
       </CardBody>
