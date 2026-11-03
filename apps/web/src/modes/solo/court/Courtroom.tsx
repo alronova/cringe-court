@@ -5,6 +5,7 @@ import { stagePose } from '@/art/art';
 import { Button, DialogueBox, IconButton, ImpactText, Stamp, cx, useReducedMotion, type ImpactKind } from '@/ds';
 import { sceneArt, setFor } from '../lib/art';
 import { SoloIcon } from '../lib/SoloIcon';
+import { SoundToggle } from '../lib/SoundToggle';
 import styles from './Courtroom.module.css';
 
 const VoxelStage = lazy(() => import('./VoxelStage'));
@@ -255,6 +256,7 @@ export function Courtroom({ lines, cast, title, exhibits = [], autoPlay = true, 
           </div>
         </div>
         <div className={styles.extra}>
+          {audio && <SoundToggle />}
           {cast && !voxelFailed && webglAvailable() && (
             <Button size="sm" variant="ghost" aria-pressed={view === '3d'} onClick={() => setView((v) => (v === '3d' ? '2d' : '3d'))}>
               3D courtroom (preview)

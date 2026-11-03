@@ -11,6 +11,7 @@
     "cutouts": "tsx scripts/gen-cutouts.ts"
   },
   "dependencies": {
+    "@cringe-court/audio": "*",
     "@cringe-court/core": "*",
     "@cringe-court/engine": "*",
     "@cringe-court/modes-solo": "*",

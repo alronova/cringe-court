@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { JurySeat, JuryState } from '@cringe-court/core';
 import { NPC_PERSONAS, isDemoTerms, type SoloSession, type SoloSnapshot } from '@cringe-court/modes-solo';
 import { Alert, Badge, Button, Countdown, ErrorState, Spinner, Stamp, cx, useReducedMotion } from '@/ds';
 import { jurorArt, sceneArt } from '../lib/art';
 import type { DemoClock } from '../lib/demoCourt';
 import { SoloIcon } from '../lib/SoloIcon';
+import { caseSound } from '../lib/sound';
+import { SoundToggle } from '../lib/SoundToggle';
 import { JURY_PACING, JURY_PACING_FAST, useJuryDirector } from './useJuryDirector';
 import styles from './JuryStage.module.css';
 
@@ -55,6 +57,20 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
   const current = stepIndex(t);
   const sealed = t.seats.filter((s) => s.committed).length;
   const opened = t.seats.filter((s) => s.revealed).length;
+  const seated = t.seats.length;
+
+  // Sound for each visible jury moment (silent until the user turns sound on).
+  const prev = useRef({ seated, sealed, opened });
+  useEffect(() => {
+    const p = prev.current;
+    if (seated > p.seated) caseSound({ type: 'juror.seated', index: seated - 1 });
+    if (sealed > p.sealed) caseSound({ type: 'ballot.committed' });
+    if (opened > p.opened) {
+      caseSound({ type: 'ballot.revealed' });
+      caseSound({ type: 'vote.counted', index: opened - 1 });
+    }
+    prev.current = { seated, sealed, opened };
+  }, [seated, sealed, opened]);
 
   const announce =
     t.step === 'recruiting'
@@ -160,6 +176,7 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
           <Button variant="secondary" size="sm" onClick={() => setRunning((r) => !r)} iconStart={<SoloIcon name={running ? 'pause' : 'play'} />}>
             {running ? 'Pause the jury' : 'Resume the jury'}
           </Button>
+          <SoundToggle />
           {!fast && !reduced && (
             <Button variant="ghost" size="sm" onClick={() => setFast(true)}>
               Fast-forward

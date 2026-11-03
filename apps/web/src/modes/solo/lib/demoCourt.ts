@@ -9,6 +9,7 @@
  */
 import { usdc, type AudioPort, type Hex } from '@cringe-court/core';
 import { MemoryChain, MemorySaltVault, MockIdentity, testAddress } from '@cringe-court/core/testing';
+import { soloAudioPort } from './sound';
 import { DemoCounsel, NpcJury, SoloSession, TeaserQuota, fromJson, memoryQuotaStore, toJson, type QuotaStore, type SoloSnapshot } from '@cringe-court/modes-solo';
 
 /** Wall-clock seconds plus a demo offset, so "skip to the deadline" works and countdowns stay live. */
@@ -41,16 +42,6 @@ export interface DemoCourtOptions {
   latencyMs?: number;
   store?: QuotaStore;
 }
-
-const silentAudio: AudioPort = {
-  id: 'silent',
-  unlock: async () => {},
-  play: () => ({ stop: () => {} }),
-  loop: () => ({ stop: () => {} }),
-  setVolume: () => {},
-  setMuted: () => {},
-  stopAll: () => {},
-};
 
 function browserStore(): QuotaStore {
   try {
@@ -89,7 +80,7 @@ export function createDemoCourt(options: DemoCourtOptions = {}): DemoCourt {
     counsel,
     jury,
     teasers,
-    audio: silentAudio,
+    audio: soloAudioPort,
     session: null,
     startSession() {
       court.session = new SoloSession({ counsel, chain: chain.as(filer), clock, jury, teasers }, { filer, demo: true });

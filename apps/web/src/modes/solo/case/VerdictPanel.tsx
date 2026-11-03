@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { formatUsdc, type ReceiptLine, type ShareState, type VerdictState } from '@cringe-court/core';
 import { NPC_PERSONAS, filerReceipt, revenueDisclosure, shareSummary, verdictTone, type SoloSession, type SoloSnapshot } from '@cringe-court/modes-solo';
 import { Alert, Amount, Badge, Button, Card, CardBody, CardHeader, CardTitle, DialogueBox, Stamp } from '@/ds';
 import { jurorArt } from '../lib/art';
+import { caseSound } from '../lib/sound';
 import { ShareCard } from '../share/ShareCard';
 import styles from './CasePage.module.css';
 
@@ -23,6 +24,11 @@ export function VerdictPanel({ snap, session }: VerdictPanelProps) {
   const back = filerReceipt(t.settlement, snap.filer);
   const lines: ReceiptLine[] = [{ kind: 'fee', label: 'You paid: jury pool, court fee and AI counsel', amount: paid }, ...back];
   const refundDue = back.some((l) => l.kind === 'refund');
+  // The verdict sting plays once, when the verdict is first shown live.
+  const live = session !== null;
+  useEffect(() => {
+    if (live) caseSound({ type: 'verdict.read', outcome: tone });
+  }, [live, tone]);
   const sentenceMood = tone === 'guilty' ? 'smug' : tone === 'not-cooked' ? 'neutral' : 'shocked';
 
   return (
