@@ -4,7 +4,7 @@ import { useDocumentTitle } from '@/app/useDocumentTitle';
 import { Amount, Badge, Icon, PaperButtonLink, PaperPanel, PaperRibbon } from '@/ds';
 import { CourtPanel } from '../components/parts';
 import { paths } from '../lib';
-import { useCourtContext } from '../state/CourtProvider';
+import { useCourtContext } from '../state/context';
 import styles from '../GrandJury.module.css';
 
 const share = (part: Usdc, whole: Usdc) => (whole > 0n ? (Number(part) / Number(whole)) * 100 : 0);

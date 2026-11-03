@@ -2,7 +2,7 @@ import { CHARACTER_NAMES, SPEAKER_CHARACTER, type CourtLine, type Segment } from
 import type { CaseDetail, LogEntry } from '@cringe-court/modes-grand-jury';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Icon, Portrait, cx, useMotion } from '@/ds';
-import { ago, portraitOf } from '../lib';
+import { ago, hearingLines, portraitOf } from '../lib';
 import styles from '../GrandJury.module.css';
 import { CourtPanel } from './parts';
 
@@ -56,7 +56,7 @@ function Line({ line, detail }: { line: CourtLine; detail: CaseDetail }) {
  */
 export function ArgumentFeed({ detail }: { detail: CaseDetail }) {
   const { reduced } = useMotion();
-  const lines = detail.sentence ? [...detail.transcript, detail.sentence] : detail.transcript;
+  const lines = hearingLines(detail);
   const [shown, setShown] = useState(lines.length);
   const playing = shown < lines.length;
   const listRef = useRef<HTMLOListElement>(null);

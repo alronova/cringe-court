@@ -1,7 +1,7 @@
 import type { CaseDetail } from '@cringe-court/modes-grand-jury';
 import { useState } from 'react';
 import { Button, Icon, Tooltip } from '@/ds';
-import { useCourtContext } from '../state/CourtProvider';
+import { useCourtContext } from '../state/context';
 import { useCourtNow } from '../state/hooks';
 import styles from '../GrandJury.module.css';
 

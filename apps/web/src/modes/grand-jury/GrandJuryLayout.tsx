@@ -2,7 +2,8 @@ import { formatUsdc, usdc } from '@cringe-court/core';
 import { NavLink, Outlet } from 'react-router';
 import { Badge, Button, ErrorState, Icon, LoadingState, Tooltip, cx, useToast } from '@/ds';
 import { paths } from './lib';
-import { CourtProvider, useCourtContext } from './state/CourtProvider';
+import { useCourtContext } from './state/context';
+import { CourtProvider } from './state/CourtProvider';
 import { useWallet } from './state/hooks';
 import styles from './GrandJury.module.css';
 

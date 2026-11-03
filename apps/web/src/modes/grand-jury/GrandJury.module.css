@@ -1827,13 +1827,16 @@
 
 /* ── My court ── */
 .statRow {
+  padding: 0;
+  list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   gap: var(--cc-space-4);
   margin: 0;
 }
 
-.stat dt {
+.statLabel {
+  margin: 0;
   color: var(--cc-color-text-muted);
   font-size: var(--cc-text-xs);
   font-weight: var(--cc-weight-bold);
@@ -1841,7 +1844,8 @@
   letter-spacing: var(--cc-tracking-caps);
 }
 
-.stat dd {
+.statValue,
+.statNum {
   margin: var(--cc-space-1) 0 0;
 }
 

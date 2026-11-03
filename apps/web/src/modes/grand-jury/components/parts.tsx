@@ -144,9 +144,12 @@ export function Benches({ entry }: { entry: Pick<DocketEntry, 'file' | 'ballot'>
     { character: 'defense' as const, name: 'Counsel Chaos' },
   ];
   return (
-    <div className={styles.benches}>
+    <section className={styles.benches} aria-labelledby="benches-title">
+      <h2 id="benches-title" className="cc-visually-hidden">
+        The two sides
+      </h2>
       {([0, 1] as const).map((b) => (
-        <section key={b} className={styles.bench} data-bench={b} aria-labelledby={`bench-${b}`}>
+        <article key={b} className={styles.bench} data-bench={b} aria-labelledby={`bench-${b}`}>
           <Portrait character={counsel[b]!.character} size="md" ring={b === 0 ? 'accent' : 'side-a'} alt="" />
           <div className={styles.benchText}>
             <p className={styles.benchWho}>
@@ -157,8 +160,8 @@ export function Benches({ entry }: { entry: Pick<DocketEntry, 'file' | 'ballot'>
             </h3>
             <p className={styles.benchSummary}>{entry.file.positions[b].summary}</p>
           </div>
-        </section>
+        </article>
       ))}
-    </div>
+    </section>
   );
 }

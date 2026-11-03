@@ -1,7 +1,7 @@
 import type { CaseAudioEvent } from '@cringe-court/audio';
-import type { CharacterId as CoreCharacterId } from '@cringe-court/core';
+import type { CharacterId as CoreCharacterId, CourtLine } from '@cringe-court/core';
 import type { CharacterId } from '@/art/art';
-import type { DocketEntry, DocketStatus, SharePalette } from '@cringe-court/modes-grand-jury';
+import type { CaseDetail, DocketEntry, DocketStatus, SharePalette } from '@cringe-court/modes-grand-jury';
 import type { BadgeTone } from '@/ds';
 
 export const paths = {
@@ -121,4 +121,9 @@ export function verdictSound(kind: 'ballot-0' | 'ballot-1' | 'no-verdict'): void
 /** Portrait for a transcript speaker. Grand Jury has no player, so `player` falls back to a plain Side A cut-out. */
 export function portraitOf(c: CoreCharacterId): CharacterId {
   return c === 'player' ? 'side-a' : c;
+}
+
+/** The beats a hearing plays, in order: the frozen transcript, then the judge's sentence once there is a verdict. */
+export function hearingLines(detail: Pick<CaseDetail, 'transcript' | 'sentence'>): readonly CourtLine[] {
+  return detail.sentence ? [...detail.transcript, detail.sentence] : detail.transcript;
 }

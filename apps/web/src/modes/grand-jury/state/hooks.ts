@@ -2,7 +2,7 @@ import type { ActionResult, CaseDetail, DocketEntry } from '@cringe-court/modes-
 import type { CaseNumber, Usdc } from '@cringe-court/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNow } from '@/ds/lib/useNow';
-import { useCourtContext } from './CourtProvider';
+import { useCourtContext } from './context';
 
 export type Loadable<T> = { state: 'loading' } | { state: 'error'; error: Error } | { state: 'ready'; data: T };
 
@@ -22,7 +22,6 @@ function useCourtQuery<T>(load: () => Promise<T>, deps: readonly unknown[]): Loa
     return () => {
       live = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [version, attempt, ...deps]);
   const retry = useCallback(() => {
     setResult({ state: 'loading' });

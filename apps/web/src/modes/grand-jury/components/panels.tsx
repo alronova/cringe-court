@@ -15,7 +15,7 @@ import {
   PaperField,
   useToast,
 } from '@/ds';
-import { useCourtContext } from '../state/CourtProvider';
+import { useCourtContext } from '../state/context';
 import { useAction, useCourtNowMs } from '../state/hooks';
 import { sound } from '../lib';
 import styles from '../GrandJury.module.css';

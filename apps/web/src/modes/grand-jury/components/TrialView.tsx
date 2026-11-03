@@ -2,7 +2,7 @@ import { CHARACTER_NAMES, SPEAKER_CHARACTER, type CourtLine } from '@cringe-cour
 import type { CaseDetail } from '@cringe-court/modes-grand-jury';
 import { useCallback, useEffect, useState } from 'react';
 import { DialogueBox, ImpactText, PaperPanel, Portrait, RoundIconButton, cx, useMotion } from '@/ds';
-import { portraitOf, sound } from '../lib';
+import { hearingLines, portraitOf, sound } from '../lib';
 import styles from '../GrandJury.module.css';
 
 /**
@@ -11,7 +11,7 @@ import styles from '../GrandJury.module.css';
  * dialogue box, with step and autoplay controls. The first-person
  * <RoamCourtroom> (v3/roam-fp) replaces the body of this component and drives
  * the same beats through `roam.runBeat(line)`: every beat it needs is a
- * `CourtLine` from `hearingLines(detail)`. Nothing else in the Grand Jury
+ * `CourtLine` from `hearingLines(detail)` (lib.ts). Nothing else in the Grand Jury
  * changes when it is swapped.
  */
 export interface TrialViewProps {
@@ -36,11 +36,6 @@ const EXPRESSION: Partial<Record<NonNullable<CourtLine['beat']>, 'smug' | 'shock
   'desk-slam': 'shocked',
 };
 
-/** The beats a hearing plays, in order: the frozen transcript, then the judge's sentence once there is a verdict. */
-export function hearingLines(detail: CaseDetail): readonly CourtLine[] {
-  return detail.sentence ? [...detail.transcript, detail.sentence] : detail.transcript;
-}
-
 const RISERS = [
   { key: 'for', character: 'prosecutor', bench: 0 },
   { key: 'court', character: 'judge', bench: undefined },
@@ -55,6 +50,8 @@ export function TrialView({ detail, startAt = 0 }: TrialViewProps) {
   const [typed, setTyped] = useState(false);
   const line = lines[index];
   const last = index >= lines.length - 1;
+  // Autoplay ends by itself on the last line.
+  const playing = autoplay && !last;
 
   const go = useCallback(
     (to: number) => {
@@ -66,22 +63,18 @@ export function TrialView({ detail, startAt = 0 }: TrialViewProps) {
 
   // Autoplay waits for the typewriter, then holds the line long enough to read it.
   useEffect(() => {
-    if (!autoplay || !typed) return;
-    if (last) {
-      setAutoplay(false);
-      return;
-    }
+    if (!playing || !typed) return;
     const id = window.setTimeout(() => go(index + 1), reduced ? 2600 : 1400);
     return () => window.clearTimeout(id);
-  }, [autoplay, typed, last, index, go, reduced]);
+  }, [playing, typed, index, go, reduced]);
 
   // Courtroom cues for the beats that have one (objection sting, gavel).
   useEffect(() => {
-    if (!autoplay || !line?.beat) return;
+    if (!playing || !line?.beat) return;
     if (line.beat === 'objection') sound({ type: 'objection', by: line.bench === 1 ? 'defense' : 'prosecution' });
     else if (line.beat === 'gavel') sound({ type: 'order' });
     else if (line.beat === 'gasp') sound({ type: 'crowd', reaction: 'gasp' });
-  }, [autoplay, line]);
+  }, [playing, line]);
 
   const onDone = useCallback(() => setTyped(true), []);
 
@@ -122,14 +115,15 @@ export function TrialView({ detail, startAt = 0 }: TrialViewProps) {
       <div className={styles.trialControls}>
         <RoundIconButton label="Previous line" icon="arrow-left" tone="gold" onClick={() => go(index - 1)} disabled={index === 0} />
         <RoundIconButton
-          label={autoplay ? 'Pause the hearing' : 'Play the hearing'}
-          icon={autoplay ? 'close' : 'gavel'}
+          label={playing ? 'Pause the hearing' : 'Play the hearing'}
+          icon={playing ? 'close' : 'gavel'}
           tone="royal"
           size="lg"
-          pressed={autoplay}
+          pressed={playing}
           onClick={() => {
-            if (last && !autoplay) go(0);
-            setAutoplay((a) => !a);
+            if (playing) return setAutoplay(false);
+            if (last) go(0);
+            setAutoplay(true);
           }}
         />
         <RoundIconButton label="Next line" icon="arrow-right" tone="gold" onClick={() => go(index + 1)} disabled={last} />

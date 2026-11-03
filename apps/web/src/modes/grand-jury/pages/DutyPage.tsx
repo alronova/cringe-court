@@ -18,7 +18,7 @@ interface Todo {
 }
 
 /** What the viewer has to do next, most urgent first. Missing a ballot window is the only way to lose a bond. */
-export function todosOf(cases: readonly CaseDetail[]): Todo[] {
+function todosOf(cases: readonly CaseDetail[]): Todo[] {
   const out: Todo[] = [];
   for (const d of cases) {
     const v = d.viewer;
@@ -114,28 +114,28 @@ export function DutyPage() {
         <p className={styles.heroLede}>Your seats, your summons and your calls from the gallery, with every deadline that matters to you.</p>
       </header>
 
-      <dl className={styles.statRow}>
-        <PaperPanel tone="gold" edge="cut" padding="sm" className={styles.stat}>
-          <dt>Test wallet</dt>
-          <dd>{balance === null ? '…' : <Amount value={balance} size="lg" />}</dd>
+      <ul className={styles.statRow} aria-label="Your numbers">
+        <PaperPanel as="li" tone="gold" edge="cut" padding="sm" className={styles.stat}>
+          <p className={styles.statLabel}>Test wallet</p>
+          <p className={styles.statValue}>{balance === null ? '…' : <Amount value={balance} size="lg" />}</p>
         </PaperPanel>
-        <PaperPanel tone="cream" edge="cut" padding="sm" className={styles.stat}>
-          <dt>Seats held</dt>
-          <dd className={styles.statNum}>{seats.length}</dd>
+        <PaperPanel as="li" tone="cream" edge="cut" padding="sm" className={styles.stat}>
+          <p className={styles.statLabel}>Seats held</p>
+          <p className={styles.statNum}>{seats.length}</p>
         </PaperPanel>
-        <PaperPanel tone="cream" edge="cut" padding="sm" className={styles.stat}>
-          <dt>Chipped in</dt>
-          <dd>
+        <PaperPanel as="li" tone="cream" edge="cut" padding="sm" className={styles.stat}>
+          <p className={styles.statLabel}>Chipped in</p>
+          <p className={styles.statValue}>
             <Amount value={contributed} size="lg" />
-          </dd>
+          </p>
         </PaperPanel>
-        <PaperPanel tone="cream" edge="cut" padding="sm" className={styles.stat}>
-          <dt>Collected / waiting</dt>
-          <dd>
+        <PaperPanel as="li" tone="cream" edge="cut" padding="sm" className={styles.stat}>
+          <p className={styles.statLabel}>Collected / waiting</p>
+          <p className={styles.statValue}>
             <Amount value={collected} size="lg" /> <span className={styles.statSub}>/ {formatUsdc(waiting)}</span>
-          </dd>
+          </p>
         </PaperPanel>
-      </dl>
+      </ul>
 
       {mine.length === 0 && todos.length === 0 ? (
         <EmptyState

@@ -221,7 +221,7 @@ describe('DemoClock', () => {
     expect(c.now()).toBe(105);
   });
   it('pins, refuses to go backwards, and unpins', () => {
-    let t = 1000;
+    const t = 1000;
     const c = new DemoClock(() => t);
     c.pin(500);
     expect(c.now()).toBe(500);
