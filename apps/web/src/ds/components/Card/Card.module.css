@@ -52,7 +52,7 @@
   --_drop: var(--cc-paper-drop-2);
 }
 
-/* The ornate frame: gold band, a hairline inner rule; corners are chamfered, so the pixel knots are dropped. */
+/* The ornate frame: gold band, a hairline inner rule, chamfered corners under gold photo-corners. */
 .ornate,
 .parchment {
   --_c: var(--cc-paper-cut-lg);
@@ -60,11 +60,6 @@
   --_edge-w: 3px;
   --_fill: var(--cc-color-surface-raised);
   --_drop: var(--cc-paper-drop-2);
-}
-
-.ornate > svg[aria-hidden],
-.parchment > svg[aria-hidden] {
-  display: none;
 }
 
 .ornate::after,
