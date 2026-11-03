@@ -5,6 +5,7 @@ export const paths = {
   home: '/',
   mode: (id: ModeId) => `/${id}`,
   courtroom: '/courtroom',
+  walk: '/court/walk',
   gallery: '/gallery',
 } as const;
 
@@ -13,5 +14,6 @@ export const NAV_ITEMS: ReadonlyArray<{ to: string; label: string }> = [
   { to: paths.mode('versus'), label: 'Versus' },
   { to: paths.mode('grand-jury'), label: 'Grand Jury' },
   { to: paths.courtroom, label: 'Demo court' },
+  { to: paths.walk, label: 'Walk the court' },
   { to: paths.gallery, label: 'Design gallery' },
 ];
