@@ -121,9 +121,9 @@ export function ConnectionsPanel({ config = platformConfig }: { config?: Platfor
           <thead>
             <tr>
               <th scope="col">Court</th>
-              <th scope="col">Case charge</th>
-              <th scope="col">Juror bond</th>
-              <th scope="col">Jurors</th>
+              <th scope="col" data-num>Case charge</th>
+              <th scope="col" data-num>Juror bond</th>
+              <th scope="col" data-num>Jurors</th>
               <th scope="col">Check</th>
             </tr>
           </thead>

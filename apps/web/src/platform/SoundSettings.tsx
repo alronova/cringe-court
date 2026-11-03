@@ -123,3 +123,20 @@ export function SoundButton({ className }: { className?: string }) {
     </div>
   );
 }
+
+/** The mute switch alone, for the phone menu sheet (full settings live on /settings). */
+export function SoundMuteSwitch() {
+  const { settings, state } = useAudioSettings();
+  if (state === 'unavailable') return null;
+  return (
+    <Switch
+      label="Sound"
+      description={settings.muted ? 'Muted on this device' : 'Gavels, stamps and the courtroom hum'}
+      checked={!settings.muted}
+      onCheckedChange={(on) => {
+        appAudio().setMuted(!on);
+        if (on) void appAudio().unlock();
+      }}
+    />
+  );
+}
