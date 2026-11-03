@@ -20,6 +20,9 @@
       "path": "./packages/modes-solo"
     },
     {
+      "path": "./packages/modes-versus"
+    },
+    {
       "path": "./apps/web"
     },
     {
