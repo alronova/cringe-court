@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, DialogueBox, Icon, OrnateFrame, Portrait, Receipt, Spinner, Stamp } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
-import { Courtroom } from './Courtroom';
+import { TrialView } from './TrialView';
 import { ShareCard } from './ShareCard';
 
 /** Your receipt from the ledger, and the claim button (pull payments, V4 §9). */
@@ -163,7 +163,7 @@ export function VerdictPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }) {
 
       <details className={styles.replay}>
         <summary>Watch the trial again</summary>
-        <Courtroom lines={s.transcript.lines} exhibits={s.exhibits} filing={s.filing} seats={seats} jurySize={s.terms.jurySize} verdict={winner ?? 'none'} />
+        <TrialView lines={s.transcript.lines} exhibits={s.exhibits} filing={s.filing} seats={seats} jurySize={s.terms.jurySize} verdict={winner ?? 'none'} />
         <p className={styles.fine}>
           Transcript fingerprint <code>{s.transcript.hash.slice(0, 18)}…</code>, recorded on the ledger before any vote. Model {s.transcript.model}.
         </p>

@@ -4,7 +4,7 @@ import { Alert, Amount, Badge, Button, Dialog, DialogClose, DialogContent, Dialo
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
 import { WithdrawButton } from './BriefPanel';
-import { Courtroom } from './Courtroom';
+import { TrialView } from './TrialView';
 
 /** Both agents are writing. The clerk in any party tab runs the draft. */
 export function DraftingPanel({ c }: { c: VersusCase }) {
@@ -59,7 +59,7 @@ export function DraftReviewPanel({ c, side }: { c: VersusCase; side: SideId }) {
   return (
     <div className={styles.stack}>
       <OrnateFrame as="section" padding="md" ribbon="The draft" aria-label="Draft trial">
-        <Courtroom lines={s.draft.lines} exhibits={s.exhibits} filing={s.filing} banner="Draft · frozen once both sides approve" />
+        <TrialView lines={s.draft.lines} exhibits={s.exhibits} filing={s.filing} banner="Draft · frozen once both sides approve" />
       </OrnateFrame>
       <section className={styles.reviewBar} aria-labelledby="approve-title">
         <div>

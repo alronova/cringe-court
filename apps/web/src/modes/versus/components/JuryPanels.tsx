@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Amount, Badge, Button, Card, CardBody, CardHeader, CardTitle, Icon, OrnateFrame, RadioCards, Stamp, useToast } from '@/ds';
 import { useVersus } from '../runtime/context';
 import styles from '../versus.module.css';
-import { Courtroom } from './Courtroom';
+import { TrialView } from './TrialView';
 import { WorldIdDialog } from './WorldIdDialog';
 
 function SeatRow({ c }: { c: VersusCase }) {
@@ -225,7 +225,7 @@ export function TrialPanel({ c, viewer }: { c: VersusCase; viewer: Viewer }) {
   return (
     <div className={styles.stack}>
       <OrnateFrame as="section" padding="md" ribbon="Court is in session" aria-label="The trial">
-        <Courtroom lines={s.transcript.lines} exhibits={s.exhibits} filing={s.filing} seats={seats} jurySize={s.terms.jurySize} />
+        <TrialView lines={s.transcript.lines} exhibits={s.exhibits} filing={s.filing} seats={seats} jurySize={s.terms.jurySize} />
       </OrnateFrame>
       {viewer === 'juror' ? (
         <BallotPanel c={c} />
