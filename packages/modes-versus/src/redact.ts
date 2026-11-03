@@ -49,7 +49,7 @@ const RULES: ReadonlyArray<{ kind: RedactionKind; re: RegExp }> = [
   { kind: 'wallet', re: /\b0x[a-fA-F0-9]{40}\b/g },
   { kind: 'ens', re: /\b[a-z0-9-]{3,}\.eth\b/gi },
   { kind: 'handle', re: /(^|[^\w@])@[A-Za-z0-9_]{2,30}\b/g },
-  { kind: 'phone', re: /(?:\+\d{1,3}[\s.-]?)?(?:\(\d{2,4}\)[\s.-]?)?\d{3,4}[\s.-]\d{3,4}(?:[\s.-]\d{2,4})?\b/g },
+  { kind: 'phone', re: /(?:\+\d{1,3}[\s.-]?)?(?:\(\d{2,4}\)[\s.-]?)?\d{3,5}[\s.-]\d{3,6}(?:[\s.-]\d{2,6})?\b/g },
   { kind: 'number', re: /\b\d{9,}\b/g },
 ];
 

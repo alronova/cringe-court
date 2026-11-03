@@ -2,8 +2,9 @@
  * Invite codes: what Side A sends Side B ("join with code K7QM-2XPA" or a link).
  *
  * Eight Crockford base-32 symbols (no I, L, O, U, so nothing reads as another
- * letter), shown as two groups of four. The eighth symbol is a check symbol, so
- * a mistyped code is caught before any lookup. Input is forgiving: lower case,
+ * letter), shown as two groups of four. The eighth symbol is a check symbol with
+ * odd (so invertible mod 32) weights, so any single mistyped symbol is caught
+ * before any lookup. Input is forgiving: lower case,
  * spaces, missing dash, and the usual confusions (O→0, I/L→1) are accepted.
  */
 export const INVITE_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
@@ -14,7 +15,7 @@ export type InviteCode = string & { readonly __inviteCode: true };
 
 function checkSymbol(body: string): string {
   let sum = 0;
-  for (let i = 0; i < body.length; i++) sum += INVITE_ALPHABET.indexOf(body[i]!) * (i + 1) * 7;
+  for (let i = 0; i < body.length; i++) sum += INVITE_ALPHABET.indexOf(body[i]!) * (2 * i + 1);
   return INVITE_ALPHABET[sum % 32]!;
 }
 
