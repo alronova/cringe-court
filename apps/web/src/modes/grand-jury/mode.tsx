@@ -10,7 +10,7 @@ import { paths } from './lib';
  */
 const grandJury: WebModeModule = {
   definition: grandJuryMode,
-  cta: { label: 'Open the docket', to: paths.docket },
+  landing: { label: 'Open the docket', to: paths.docket },
   routes: [
     {
       element: <GrandJuryLayout />,
