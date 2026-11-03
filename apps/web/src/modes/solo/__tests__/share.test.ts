@@ -39,7 +39,7 @@ describe('share card renderer', () => {
     const { ctx, calls, styles } = recorder();
     drawShareCard(ctx, SUMMARY, format);
     const texts = calls.filter((c) => c.op === 'fillText').map((c) => String(c.args[0]));
-    expect(texts).toEqual(expect.arrayContaining(['GUILTY', '2 – 1', '— Miss Ratio', 'Your Honor, bro is cooked.']));
+    expect(texts).toEqual(expect.arrayContaining(['GUILTY', '2 – 1', '— Miss Ratio', 'Your Honor, bro is cooked.', 'CringeCourt']));
     expect(texts.some((t) => t.includes('TESTNET DEMO'))).toBe(true);
     // Palette colours only (tokens): hex from the palette or rgb() derived from it.
     for (const s of styles) expect(s).toMatch(/^(#[0-9A-F]{6}|rgb\(\d+ \d+ \d+ \/ [\d.]+\))$/);

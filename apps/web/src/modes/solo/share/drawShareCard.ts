@@ -13,7 +13,6 @@ export const SHARE_SIZES: Readonly<Record<ShareFormat, { width: number; height: 
 };
 
 export interface ShareAssets {
-  wordmark?: CanvasImageSource;
   /** Portrait of whoever is quoted. */
   speaker?: CanvasImageSource;
   /** The three juror sprites. */
@@ -59,6 +58,7 @@ const TONE_COLOR: Readonly<Record<VerdictTone, string>> = {
 const display = (px: number, weight = 700) => `${weight} ${px}px ${fontFamily.display}`;
 const body = (px: number, weight = 500) => `${weight} ${px}px ${fontFamily.body}`;
 const mono = (px: number, weight = 600) => `${weight} ${px}px ${fontFamily.mono}`;
+const pixel = (px: number, weight = 700) => `${weight} ${px}px ${fontFamily.pixel}`;
 
 function roundRect(ctx: CardContext, x: number, y: number, w: number, h: number, r: number): void {
   ctx.beginPath();
@@ -150,8 +150,15 @@ function stamp(ctx: CardContext, s: ShareSummary, cx: number, cy: number, scale:
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(-0.12);
-  ctx.font = display(Math.round(78 * scale));
   const label = s.verdictLabel;
+  // Fit the label inside the stamp's maximum width, whatever the face.
+  const maxText = 330 * scale;
+  let size = Math.round(76 * scale);
+  ctx.font = pixel(size);
+  while (size > 24 && ctx.measureText(label).width > maxText) {
+    size -= 2;
+    ctx.font = pixel(size);
+  }
   const w = Math.max(ctx.measureText(label).width + 70 * scale, 300 * scale);
   const h = 150 * scale;
   ctx.fillStyle = alpha(color, 0.08);
@@ -167,7 +174,7 @@ function stamp(ctx: CardContext, s: ShareSummary, cx: number, cy: number, scale:
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(label, 0, -8 * scale);
-  ctx.font = mono(Math.round(18 * scale));
+  ctx.font = pixel(Math.round(18 * scale), 600);
   ctx.fillText(s.tone === 'no-verdict' ? 'FULL REFUND' : `VERDICT · ${s.caseLabel}`, 0, 44 * scale);
   ctx.restore();
 }
@@ -176,7 +183,7 @@ function tally(ctx: CardContext, s: ShareSummary, cx: number, y: number): void {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = palette.neutral[900];
-  ctx.font = display(64);
+  ctx.font = pixel(64);
   ctx.fillText(`${s.tally[0]} – ${s.tally[1]}`, cx, y);
   ctx.font = mono(16);
   ctx.fillStyle = palette.neutral[700];
@@ -228,30 +235,32 @@ function footer(ctx: CardContext, s: ShareSummary, w: number, h: number): void {
   ctx.fillStyle = palette.royal[900];
   ctx.fillRect(32, y, w - 64, bandH);
   ctx.textBaseline = 'middle';
-  ctx.font = display(20, 600);
+  ctx.font = `italic 600 22px ${fontFamily.display}`;
   ctx.fillStyle = palette.gold[300];
   ctx.textAlign = 'left';
-  ctx.fillText('CRINGECOURT · Your Honor, bro is cooked.', 58, y + bandH / 2);
+  ctx.fillText('CringeCourt ◆ Your Honor, Bro Is Cooked.', 58, y + bandH / 2);
   ctx.font = mono(14, 500);
   ctx.fillStyle = palette.gold[100];
   ctx.textAlign = 'right';
   ctx.fillText(`TESTNET DEMO · transcript ${s.fingerprint}`, w - 58, y + bandH / 2);
 }
 
-function header(ctx: CardContext, s: ShareSummary, assets: ShareAssets, x: number, y: number): number {
+function header(ctx: CardContext, s: ShareSummary, x: number, y: number): number {
   let top = y;
-  if (assets.wordmark) {
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(assets.wordmark, x, top, 260, 52);
-    top += 70;
-  } else {
-    ctx.font = display(40);
-    ctx.fillStyle = palette.royal[900];
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText('CringeCourt', x, top + 40);
-    top += 64;
-  }
+  // The style-guide wordmark: maroon serif with a gold rule and diamonds.
+  ctx.font = display(40, 800);
+  ctx.fillStyle = palette.gold[700];
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('CringeCourt', x + 2, top + 42);
+  ctx.fillStyle = palette.royal[900];
+  ctx.fillText('CringeCourt', x, top + 40);
+  const markW = ctx.measureText('CringeCourt').width;
+  ctx.fillStyle = palette.gold[500];
+  ctx.fillRect(x + markW + 18, top + 26, 120, 3);
+  diamond(ctx, x + markW + 18, top + 27, 6, palette.gold[500]);
+  diamond(ctx, x + markW + 138, top + 27, 6, palette.gold[500]);
+  top += 62;
   ctx.font = mono(18);
   ctx.fillStyle = palette.gold[900];
   ctx.textAlign = 'left';
@@ -267,7 +276,7 @@ export function drawShareCard(ctx: CardContext, s: ShareSummary, format: ShareFo
   ctx.save();
   frame(ctx, w, h);
   if (format === 'landscape') {
-    let y = header(ctx, s, assets, 64, 58);
+    let y = header(ctx, s, 64, 58);
     ctx.font = display(50);
     ctx.fillStyle = palette.royal[900];
     const title = wrap(ctx, s.title, 640, 2);
@@ -281,7 +290,7 @@ export function drawShareCard(ctx: CardContext, s: ShareSummary, format: ShareFo
     tally(ctx, s, 950, 360);
     jurors(ctx, assets, 950, 400, 64);
   } else {
-    let y = header(ctx, s, assets, 72, 64);
+    let y = header(ctx, s, 72, 64);
     ctx.font = display(58);
     ctx.fillStyle = palette.royal[900];
     const title = wrap(ctx, s.title, w - 144, 2);
@@ -294,8 +303,8 @@ export function drawShareCard(ctx: CardContext, s: ShareSummary, format: ShareFo
     ctx.fillStyle = palette.neutral[900];
     ctx.fillText(s.headline, w / 2, y + 410);
     ctx.textAlign = 'left';
-    quote(ctx, s, assets, 72, y + 450, w - 144, 3);
-    jurors(ctx, assets, w - 190, y + 250, 58);
+    const bottom = quote(ctx, s, assets, 72, y + 450, w - 144, 3);
+    jurors(ctx, assets, w / 2, Math.min(bottom + 28, h - 250), 88);
   }
   footer(ctx, s, w, h);
   ctx.restore();

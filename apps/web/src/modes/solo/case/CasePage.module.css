@@ -1,5 +1,6 @@
 .page {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--cc-space-8);
   max-width: var(--cc-content-max);
   margin-inline: auto;
@@ -46,7 +47,7 @@
 }
 
 .eyebrow {
-  font-family: var(--cc-font-display);
+  font-family: var(--cc-font-pixel);
   font-size: var(--cc-text-sm);
   letter-spacing: var(--cc-tracking-caps);
   text-transform: uppercase;
@@ -76,6 +77,7 @@
 
 .verdict {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--cc-space-8);
 }
 
@@ -256,7 +258,8 @@
 .docketCard {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: var(--cc-space-4);
+  gap: var(--cc-space-5);
+  padding: var(--cc-space-5);
   align-items: center;
   position: relative;
 }

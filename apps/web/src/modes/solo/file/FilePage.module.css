@@ -26,6 +26,7 @@
 
 .body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--cc-space-6);
 }
 
@@ -36,7 +37,7 @@
 }
 
 .eyebrow {
-  font-family: var(--cc-font-display);
+  font-family: var(--cc-font-pixel);
   font-size: var(--cc-text-sm);
   letter-spacing: var(--cc-tracking-caps);
   text-transform: uppercase;
@@ -249,7 +250,7 @@
   border-radius: var(--cc-radius-sm);
   background: var(--cc-color-accent);
   color: var(--cc-color-on-accent);
-  font-family: var(--cc-font-display);
+  font-family: var(--cc-font-pixel);
 }
 
 .exhibitForm {

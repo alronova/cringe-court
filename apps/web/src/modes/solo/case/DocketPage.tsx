@@ -23,6 +23,11 @@ export function DocketPage() {
         </ButtonLink>
         <h1 className={styles.title}>Your docket</h1>
         <p className={styles.small}>Decided cases from this browser. Open one to see the verdict, the receipt and the share card again.</p>
+        {entries.length > 0 && (
+          <ButtonLink to={soloPaths.file} iconStart={<Icon name="plus" />}>
+            File another confession
+          </ButtonLink>
+        )}
       </header>
 
       {liveCase && (

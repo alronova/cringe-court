@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { NPC_PERSONAS, type ShareSummary } from '@cringe-court/modes-solo';
-import { brandArt, portrait } from '@/art/art';
+import { portrait } from '@/art/art';
 import { Alert, Button, Icon, Skeleton, buttonClassName, useToast } from '@/ds';
 import { fontFamily } from '@/ds/tokens';
 import { jurorArt } from '../lib/art';
@@ -25,21 +25,22 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
 
 async function loadAssets(summary: ShareSummary): Promise<ShareAssets> {
   const speaker = summary.quote?.by === 'Miss Ratio' ? 'prosecutor' : summary.quote?.by === 'Counsel Chaos' ? 'defense' : 'judge';
-  const [wordmark, face, ...jurors] = await Promise.all([
-    loadImage(brandArt('wordmark')),
+  const [face, ...jurors] = await Promise.all([
     loadImage(portrait(speaker, 'smug').src),
     ...NPC_PERSONAS.map((p) => loadImage(jurorArt(p.id))),
   ]);
   const assets: ShareAssets = { jurors: jurors.filter((j): j is HTMLImageElement => j !== null) };
-  if (wordmark) assets.wordmark = wordmark;
   if (face) assets.speaker = face;
   return assets;
 }
 
 async function fontsReady(): Promise<void> {
   try {
-    const family = fontFamily.display.split(',')[0]!;
-    await Promise.race([document.fonts.load(`700 40px ${family}`), new Promise((r) => setTimeout(r, 1500))]);
+    const faces = [fontFamily.display, fontFamily.pixel, fontFamily.body, fontFamily.mono].map((f) => f.split(',')[0]!);
+    await Promise.race([
+      Promise.all(faces.flatMap((f) => [document.fonts.load(`700 40px ${f}`), document.fonts.load(`italic 600 22px ${f}`)])),
+      new Promise((r) => setTimeout(r, 2000)),
+    ]);
   } catch {
     // Older browsers: draw with the fallback face.
   }
