@@ -129,6 +129,7 @@
 @media (max-width: 40rem) {
   .brandWide,
   .badgeButton,
+  .gear,
   .cta {
     display: none;
   }
