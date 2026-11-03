@@ -2,7 +2,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type React
 import type { AudioPort, CastMember, CourtLine, PublicExhibit } from '@cringe-court/core';
 import { SEGMENT_TITLES, directAll, type Shot, type StageActor } from '@cringe-court/modes-solo';
 import { stagePose } from '@/art/art';
-import { Button, DialogueBox, IconButton, ImpactText, Stamp, cx, useReducedMotion, type ImpactKind } from '@/ds';
+import { Button, DialogueBox, IconButton, ImpactText, PaperPanel, PaperRibbon, Stamp, cx, useReducedMotion, type ImpactKind } from '@/ds';
 import { sceneArt, setFor } from '../lib/art';
 import { SoloIcon } from '../lib/SoloIcon';
 import { SoundToggle } from '../lib/SoundToggle';
@@ -65,7 +65,18 @@ function actorArt(actor: Actor, pose: string): string {
  * Space/K play–pause, ←/→ previous/next line (while focus is in the courtroom).
  * Screen readers hear each line once, in full, from a polite live region.
  */
-export function Courtroom({ lines, cast, view: trialView = voxelTrialView, title, exhibits = [], autoPlay = true, onFinished, audio, actions, className }: CourtroomProps) {
+export function Courtroom({
+  lines,
+  cast,
+  view: trialView = voxelTrialView,
+  title,
+  exhibits = [],
+  autoPlay = true,
+  onFinished,
+  audio,
+  actions,
+  className,
+}: CourtroomProps) {
   const reduced = useReducedMotion();
   const shots = useMemo(() => directAll(lines), [lines]);
   const [index, setIndex] = useState(0);
@@ -167,20 +178,32 @@ export function Courtroom({ lines, cast, view: trialView = voxelTrialView, title
             </Suspense>
           </div>
         )}
-        <div
-          key={`fx-${index}`}
-          className={styles.camera}
-          data-camera={shot.camera}
-          data-fx={shot.fx ?? undefined}
-          aria-hidden
-        >
+        <div key={`fx-${index}`} className={styles.camera} data-camera={shot.camera} data-fx={shot.fx ?? undefined} aria-hidden>
           <img className={styles.set} src={sceneArt(set)} alt="" data-pixel />
           <div className={styles.judgeBox}>
-            <img className={styles.judge} src={actorArt('judge', shot.poses.judge)} alt="" data-pixel data-speaking={shot.speaker === 'judge' || undefined} />
+            <img
+              className={styles.judge}
+              src={actorArt('judge', shot.poses.judge)}
+              alt=""
+              data-pixel
+              data-speaking={shot.speaker === 'judge' || undefined}
+            />
           </div>
-          <img className={cx(styles.actor, styles.prosecutor)} src={actorArt('prosecutor', shot.poses.prosecutor)} alt="" data-pixel data-speaking={shot.speaker === 'prosecutor' || undefined} />
+          <img
+            className={cx(styles.actor, styles.prosecutor)}
+            src={actorArt('prosecutor', shot.poses.prosecutor)}
+            alt=""
+            data-pixel
+            data-speaking={shot.speaker === 'prosecutor' || undefined}
+          />
           <img className={cx(styles.actor, styles.defendant)} src={actorArt('defendant', shot.poses.defendant)} alt="" data-pixel />
-          <img className={cx(styles.actor, styles.defense)} src={actorArt('defense', shot.poses.defense)} alt="" data-pixel data-speaking={shot.speaker === 'defense' || undefined} />
+          <img
+            className={cx(styles.actor, styles.defense)}
+            src={actorArt('defense', shot.poses.defense)}
+            alt=""
+            data-pixel
+            data-speaking={shot.speaker === 'defense' || undefined}
+          />
           <span className={cx(styles.nameplate, styles.plateP)}>Miss Ratio · prosecution</span>
           <span className={cx(styles.nameplate, styles.plateD)}>Counsel Chaos · your lawyer</span>
         </div>
@@ -201,82 +224,106 @@ export function Courtroom({ lines, cast, view: trialView = voxelTrialView, title
           </div>
         )}
         {exhibit && (
-          <figure key={`ex-${index}`} className={styles.exhibit} aria-hidden data-surface="parchment">
-            <figcaption>
-              Exhibit {exhibitLetter} · {exhibit.title}
-            </figcaption>
-            <p>{exhibit.body}</p>
+          <figure key={`ex-${index}`} className={styles.exhibit} aria-hidden>
+            <PaperPanel tone="cream" edge="torn" elevation={3} backing="gold" padding="sm">
+              <figcaption>
+                Exhibit {exhibitLetter} · {exhibit.title}
+              </figcaption>
+              <p>{exhibit.body}</p>
+            </PaperPanel>
           </figure>
         )}
-        <span className={styles.segmentTag} aria-hidden>
+        <PaperRibbon as="div" tone="maroon" size="sm" className={styles.segmentTag} aria-hidden>
           {SEGMENT_TITLES[shot.line.segment]}
-        </span>
+        </PaperRibbon>
       </div>
 
-      <DialogueBox
-        key={shot.line.id + index}
-        className={styles.dialogue}
-        speaker={speakerCharacter}
-        expression={shot.mood}
-        speakerName={SPEAKER_NAME[shot.speaker]}
-        text={shot.line.text}
-        speed={52}
-        onDone={onDone}
-      />
+      <PaperPanel tone="cream" edge="cut" elevation={3} backing="gold" padding="none" className={styles.dialogueSheet} data-surface="parchment">
+        <DialogueBox
+          key={shot.line.id + index}
+          className={styles.dialogue}
+          speaker={speakerCharacter}
+          expression={shot.mood}
+          speakerName={SPEAKER_NAME[shot.speaker]}
+          text={shot.line.text}
+          speed={52}
+          onDone={onDone}
+        />
+      </PaperPanel>
       <p className="cc-visually-hidden" aria-live="polite" aria-atomic>
         {`${SPEAKER_NAME[shot.speaker]}: ${shot.line.text}`}
       </p>
 
-      <div className={styles.controls}>
-        <div className={styles.transport}>
-          <IconButton size="sm" variant="secondary" label="Previous line" icon={<SoloIcon name="prev" />} onClick={() => go(index - 1)} disabled={index === 0} />
-          <IconButton
-            size="md"
-            variant="primary"
-            label={playing ? 'Pause' : last && typed ? 'Replay from the start' : 'Play'}
-            icon={<SoloIcon name={playing ? 'pause' : 'play'} />}
-            onClick={() => {
-              if (!playing && last && typed) {
-                finishedRef.current = true;
-                go(0);
-              }
-              setPlaying((p) => !p);
-            }}
-          />
-          <IconButton size="sm" variant="secondary" label="Next line" icon={<SoloIcon name="next" />} onClick={() => go(index + 1)} disabled={last} />
-        </div>
-        <div className={styles.progress}>
-          <span className={styles.counter}>
-            Line {index + 1} of {shots.length}
-          </span>
-          <div className={styles.chapters} role="group" aria-label="Jump to a part of the trial">
-            {segments.map((seg) => {
-              const first = lines.findIndex((l) => l.segment === seg);
-              const active = shot.line.segment === seg;
-              return (
-                <button key={seg} type="button" className={styles.chapter} aria-current={active ? 'step' : undefined} onClick={() => go(first)}>
-                  {SEGMENT_TITLES[seg]}
-                </button>
-              );
-            })}
+      <PaperPanel tone="maroon" edge="cut" elevation={2} padding="sm" className={styles.controlsSheet}>
+        <div className={styles.controls}>
+          <div className={styles.transport}>
+            <IconButton
+              size="sm"
+              variant="secondary"
+              label="Previous line"
+              icon={<SoloIcon name="prev" />}
+              onClick={() => go(index - 1)}
+              disabled={index === 0}
+            />
+            <IconButton
+              size="md"
+              variant="gold"
+              label={playing ? 'Pause' : last && typed ? 'Replay from the start' : 'Play'}
+              icon={<SoloIcon name={playing ? 'pause' : 'play'} />}
+              onClick={() => {
+                if (!playing && last && typed) {
+                  finishedRef.current = true;
+                  go(0);
+                }
+                setPlaying((p) => !p);
+              }}
+            />
+            <IconButton
+              size="sm"
+              variant="secondary"
+              label="Next line"
+              icon={<SoloIcon name="next" />}
+              onClick={() => go(index + 1)}
+              disabled={last}
+            />
           </div>
-          <div className={styles.bar} aria-hidden>
-            <span style={{ inlineSize: `${((index + (typed ? 1 : 0.5)) / shots.length) * 100}%` }} />
+          <div className={styles.progress}>
+            <span className={styles.counter}>
+              Line {index + 1} of {shots.length}
+            </span>
+            <div className={styles.chapters} role="group" aria-label="Jump to a part of the trial">
+              {segments.map((seg) => {
+                const first = lines.findIndex((l) => l.segment === seg);
+                const active = shot.line.segment === seg;
+                return (
+                  <button key={seg} type="button" className={styles.chapter} aria-current={active ? 'step' : undefined} onClick={() => go(first)}>
+                    {SEGMENT_TITLES[seg]}
+                  </button>
+                );
+              })}
+            </div>
+            <div className={styles.bar} aria-hidden>
+              <span
+                style={{
+                  inlineSize: `${((index + (typed ? 1 : 0.5)) / shots.length) * 100}%`,
+                }}
+              />
+            </div>
           </div>
-        </div>
-        <div className={styles.extra}>
-          {audio && <SoundToggle />}
-          {cast && !voxelFailed && (!trialView.requiresWebGL || webglAvailable()) && (
-            <Button size="sm" variant="ghost" aria-pressed={view === '3d'} onClick={() => setView((v) => (v === '3d' ? '2d' : '3d'))}>
-              {trialView.label}
+          <div className={styles.extra}>
+            {audio && <SoundToggle />}
+            {cast && !voxelFailed && (!trialView.requiresWebGL || webglAvailable()) && (
+              <Button size="sm" variant="ghost" aria-pressed={view === '3d'} onClick={() => setView((v) => (v === '3d' ? '2d' : '3d'))}>
+                {trialView.label}
+              </Button>
+            )}
+            <Button size="sm" variant="ghost" aria-expanded={showTranscript} onClick={() => setShowTranscript((s) => !s)}>
+              {showTranscript ? 'Hide transcript' : 'Transcript'}
             </Button>
-          )}
-          <Button size="sm" variant="ghost" aria-expanded={showTranscript} onClick={() => setShowTranscript((s) => !s)}>
-            {showTranscript ? 'Hide transcript' : 'Transcript'}
-          </Button>
-          {actions}
+            {actions}
+          </div>
         </div>
-      </div>
+      </PaperPanel>
       <p className={styles.hint}>
         Space to play or pause · ← → to move between lines
         {voxelFailed && ` · “${trialView.label}” could not load here, so this is the illustrated stage.`}

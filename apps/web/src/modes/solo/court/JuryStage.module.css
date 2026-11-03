@@ -25,7 +25,8 @@
 }
 
 .title {
-  font-size: var(--cc-text-3xl);
+  justify-self: start;
+  margin-top: var(--cc-space-2);
 }
 
 .stepNote {
@@ -152,21 +153,25 @@
   to { scale: 1; opacity: 1; }
 }
 
+/* Each juror's card is a cut sheet of cream card; a revealed vote gets the gold backing. */
+.plateSheet {
+  width: 100%;
+  transition: rotate var(--cc-duration-slow) var(--cc-ease-emphasized);
+}
+
+.seat:nth-child(1) .plateSheet { rotate: -0.8deg; }
+.seat:nth-child(3) .plateSheet { rotate: 0.8deg; }
+
 .plate {
   display: grid;
   gap: var(--cc-space-1);
   justify-items: start;
   padding: var(--cc-space-3);
-  border-radius: var(--cc-radius-md);
-  background: var(--cc-color-surface);
-  box-shadow: inset 0 3px 0 var(--cc-gold-500), var(--cc-shadow-1);
-  color: var(--cc-color-text);
 }
 
 @media (min-width: 720px) {
   .plate {
     justify-items: center;
-    width: 100%;
   }
 }
 
@@ -190,23 +195,11 @@
 }
 
 .ballotBox {
-  display: grid;
-  place-items: center;
-  width: 7rem;
-  margin: var(--cc-space-4) auto 0;
-  padding: var(--cc-space-2);
-  border: 3px solid var(--cc-gold-700);
-  border-radius: var(--cc-radius-sm);
-  background: var(--cc-royal-900);
-  color: var(--cc-gold-300);
+  width: 8rem;
+  margin: var(--cc-space-5) auto 0;
   font-family: var(--cc-font-pixel);
   letter-spacing: var(--cc-tracking-caps);
-  box-shadow: inset 0 -6px 0 var(--cc-royal-700), var(--cc-shadow-2);
-}
-
-.open {
-  background: var(--cc-gold-300);
-  color: var(--cc-royal-900);
+  text-align: center;
 }
 
 .timers {

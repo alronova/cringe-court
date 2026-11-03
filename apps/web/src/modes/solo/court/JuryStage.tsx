@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JurySeat, JuryState } from '@cringe-court/core';
 import { NPC_PERSONAS, isDemoTerms, type SoloSession, type SoloSnapshot } from '@cringe-court/modes-solo';
-import { Alert, Badge, Button, Countdown, ErrorState, Spinner, Stamp, cx, useReducedMotion } from '@/ds';
+import { Alert, Badge, Button, Countdown, ErrorState, PaperButton, PaperPanel, PaperRibbon, Spinner, Stamp, useReducedMotion } from '@/ds';
 import { jurorArt, sceneArt } from '../lib/art';
 import type { DemoClock } from '../lib/demoCourt';
 import { SoloIcon } from '../lib/SoloIcon';
@@ -28,11 +28,29 @@ function useDemoNow(clock: DemoClock): number {
   return now;
 }
 
-function seatStatus(seat: JurySeat | undefined, step: JuryState['step'], ballot: readonly [string, string]): { text: string; tone: 'neutral' | 'info' | 'highlight' | 'danger' | 'success' } {
+function seatStatus(
+  seat: JurySeat | undefined,
+  step: JuryState['step'],
+  ballot: readonly [string, string],
+): {
+  text: string;
+  tone: 'neutral' | 'info' | 'highlight' | 'danger' | 'success';
+} {
   if (!seat) return { text: 'Seat empty', tone: 'neutral' };
-  if (seat.revealed && seat.choice !== undefined) return { text: ballot[seat.choice], tone: seat.choice === 0 ? 'danger' : 'success' };
-  if (seat.committed) return { text: step === 'reveal' ? 'Opening scroll…' : 'Scroll sealed', tone: 'highlight' };
-  return { text: step === 'commit' ? 'Deciding…' : 'Seated · bond posted', tone: 'info' };
+  if (seat.revealed && seat.choice !== undefined)
+    return {
+      text: ballot[seat.choice],
+      tone: seat.choice === 0 ? 'danger' : 'success',
+    };
+  if (seat.committed)
+    return {
+      text: step === 'reveal' ? 'Opening scroll…' : 'Scroll sealed',
+      tone: 'highlight',
+    };
+  return {
+    text: step === 'commit' ? 'Deciding…' : 'Seated · bond posted',
+    tone: 'info',
+  };
 }
 
 export interface JuryStageProps {
@@ -86,9 +104,9 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
       <header className={styles.head}>
         <div>
           <p className={styles.eyebrow}>Phase 3 · The jury</p>
-          <h2 id="jury-title" className={styles.title}>
+          <PaperRibbon as="h2" id="jury-title" tone="maroon" className={styles.title}>
             {t.step === 'finalizing' ? 'Counting the scrolls' : 'The jury is out'}
-          </h2>
+          </PaperRibbon>
         </div>
         <p className={styles.stepNote}>
           Step {current + 1} of {STEPS.length} · {STEPS[current]}
@@ -97,8 +115,9 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
 
       {demo && (
         <Alert tone="info" title="Demo jury: three NPCs, real procedure">
-          In a live case three random World ID–verified humans take these seats. Here, NPC jurors post the real 0.40 test-USDC bond and seal
-          real commit–reveal ballots on the in-browser ledger. Deadlines are demo settings ({t.terms.deadlines.commit / 60} min to seal, {t.terms.deadlines.reveal / 60} min to open; live cases use 20 and 10) and the demo clock skips ahead once everyone is done.
+          In a live case three random World ID–verified humans take these seats. Here, NPC jurors post the real 0.40 test-USDC bond and seal real
+          commit–reveal ballots on the in-browser ledger. Deadlines are demo settings ({t.terms.deadlines.commit / 60} min to seal,{' '}
+          {t.terms.deadlines.reveal / 60} min to open; live cases use 20 and 10) and the demo clock skips ahead once everyone is done.
         </Alert>
       )}
 
@@ -109,7 +128,12 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
             const status = seatStatus(seat, t.step, t.terms.ballot);
             const said = seat?.revealed && seat.choice !== undefined ? p.says[seat.choice] : null;
             return (
-              <li key={p.id} className={styles.seat} data-filled={Boolean(seat) || undefined} data-state={seat?.revealed ? 'revealed' : seat?.committed ? 'sealed' : seat ? 'seated' : 'empty'}>
+              <li
+                key={p.id}
+                className={styles.seat}
+                data-filled={Boolean(seat) || undefined}
+                data-state={seat?.revealed ? 'revealed' : seat?.committed ? 'sealed' : seat ? 'seated' : 'empty'}
+              >
                 <div className={styles.figure}>
                   <img src={jurorArt(p.id)} alt="" data-pixel className={styles.sprite} />
                   {seat?.committed && !seat.revealed && (
@@ -119,21 +143,37 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
                   )}
                   {said && <p className={styles.bubble}>“{said}”</p>}
                 </div>
-                <div className={styles.plate}>
-                  <span className={styles.seatNo}>Seat {i + 1}</span>
-                  <strong className={styles.name}>{p.name}</strong>
-                  <span className={styles.bio}>{p.bio}</span>
-                  <Badge tone={status.tone} dot={status.tone === 'info' || status.tone === 'highlight' ? 'pulse' : undefined}>
-                    {status.text}
-                  </Badge>
-                </div>
+                <PaperPanel
+                  tone="cream"
+                  edge="cut"
+                  elevation={seat ? 2 : 1}
+                  backing={seat?.revealed ? 'gold' : 'none'}
+                  padding="none"
+                  className={styles.plateSheet}
+                >
+                  <div className={styles.plate}>
+                    <span className={styles.seatNo}>Seat {i + 1}</span>
+                    <strong className={styles.name}>{p.name}</strong>
+                    <span className={styles.bio}>{p.bio}</span>
+                    <Badge tone={status.tone} dot={status.tone === 'info' || status.tone === 'highlight' ? 'pulse' : undefined}>
+                      {status.text}
+                    </Badge>
+                  </div>
+                </PaperPanel>
               </li>
             );
           })}
         </ol>
-        <div className={cx(styles.ballotBox, t.step === 'reveal' || t.step === 'finalizing' ? styles.open : undefined)} aria-hidden>
-          <span>{t.step === 'reveal' || t.step === 'finalizing' ? 'OPEN' : 'SEALED'}</span>
-        </div>
+        <PaperPanel
+          tone={t.step === 'reveal' || t.step === 'finalizing' ? 'gold' : 'maroon'}
+          edge="zigzag"
+          elevation={3}
+          padding="sm"
+          className={styles.ballotBox}
+          aria-hidden
+        >
+          {t.step === 'reveal' || t.step === 'finalizing' ? 'OPEN' : 'SEALED'}
+        </PaperPanel>
       </div>
 
       <p className="cc-visually-hidden" aria-live="polite">
@@ -142,13 +182,31 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
 
       <div className={styles.timers}>
         {t.step === 'commit' && t.commitEndsAt && (
-          <Countdown label="Secret Verdict Scroll closes" startsAt={(t.commitEndsAt - t.terms.deadlines.commit) * 1000} endsAt={t.commitEndsAt * 1000} now={now} compact />
+          <Countdown
+            label="Secret Verdict Scroll closes"
+            startsAt={(t.commitEndsAt - t.terms.deadlines.commit) * 1000}
+            endsAt={t.commitEndsAt * 1000}
+            now={now}
+            compact
+          />
         )}
         {t.step === 'reveal' && t.revealEndsAt && (
-          <Countdown label="Scrolls must be opened" startsAt={(t.revealEndsAt - t.terms.deadlines.reveal) * 1000} endsAt={t.revealEndsAt * 1000} now={now} compact />
+          <Countdown
+            label="Scrolls must be opened"
+            startsAt={(t.revealEndsAt - t.terms.deadlines.reveal) * 1000}
+            endsAt={t.revealEndsAt * 1000}
+            now={now}
+            compact
+          />
         )}
         {t.step === 'recruiting' && (
-          <Countdown label="Seats must fill" startsAt={(t.recruitEndsAt - t.terms.deadlines.recruitment) * 1000} endsAt={t.recruitEndsAt * 1000} now={now} compact />
+          <Countdown
+            label="Seats must fill"
+            startsAt={(t.recruitEndsAt - t.terms.deadlines.recruitment) * 1000}
+            endsAt={t.recruitEndsAt * 1000}
+            now={now}
+            compact
+          />
         )}
         {t.step === 'finalizing' && (
           <p className={styles.finalizing}>
@@ -173,9 +231,9 @@ export function JuryStage({ session, snap, clock }: JuryStageProps) {
         </ErrorState>
       ) : (
         <div className={styles.actions}>
-          <Button variant="secondary" size="sm" onClick={() => setRunning((r) => !r)} iconStart={<SoloIcon name={running ? 'pause' : 'play'} />}>
+          <PaperButton variant="maroon" size="sm" onClick={() => setRunning((r) => !r)} iconStart={<SoloIcon name={running ? 'pause' : 'play'} />}>
             {running ? 'Pause the jury' : 'Resume the jury'}
-          </Button>
+          </PaperButton>
           <SoundToggle />
           {!fast && !reduced && (
             <Button variant="ghost" size="sm" onClick={() => setFast(true)}>

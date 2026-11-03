@@ -3,7 +3,7 @@ import { Navigate } from 'react-router';
 import type { Usdc } from '@cringe-court/core';
 import { EMPTY_DRAFT, type SoloDraft } from '@cringe-court/modes-solo';
 import { useDocumentTitle } from '@/app/useDocumentTitle';
-import { ButtonLink, Icon, PhaseStepper } from '@/ds';
+import { Icon, PaperButtonLink, PaperRibbon, PhaseStepper } from '@/ds';
 import { clearDraftText, demoCourt, loadDraftText, saveDraftText } from '../lib/demoCourt';
 import { soloPaths } from '../lib/paths';
 import { useSessionSnapshot } from '../lib/useSession';
@@ -25,7 +25,7 @@ export function FilePage() {
   const snap = useSessionSnapshot(session)!;
   const [draft, setDraft] = useState<SoloDraft>(() => loadDraftText(EMPTY_DRAFT));
   const [balance, setBalance] = useState<Usdc | null>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
   const t = snap.trial;
   const stepKey = `${t.stage}/${t.step}`;
 
@@ -38,7 +38,7 @@ export function FilePage() {
       first.current = false;
       return;
     }
-    headingRef.current?.focus();
+    headingRef.current?.querySelector<HTMLElement>('h1')?.focus();
     window.scrollTo?.({ top: 0, behavior: 'smooth' });
   }, [stepKey]);
 
@@ -60,12 +60,14 @@ export function FilePage() {
   return (
     <div className={styles.page}>
       <div className={styles.top}>
-        <ButtonLink to={soloPaths.landing} variant="ghost" size="sm" iconStart={<Icon name="arrow-left" />}>
+        <PaperButtonLink to={soloPaths.landing} variant="maroon" size="sm" iconStart={<Icon name="arrow-left" />}>
           Solo Court
-        </ButtonLink>
-        <h1 ref={headingRef} tabIndex={-1} className={styles.pageTitle}>
-          File a confession
-        </h1>
+        </PaperButtonLink>
+        <div ref={headingRef} className={styles.pageTitle}>
+          <PaperRibbon as="h1" size="lg" sparks tabIndex={-1}>
+            File a confession
+          </PaperRibbon>
+        </div>
         <PhaseStepper steps={STEPS} current={current} label="Filing progress" className={styles.stepper} />
       </div>
 

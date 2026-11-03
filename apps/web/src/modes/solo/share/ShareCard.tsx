@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NPC_PERSONAS, type ShareSummary } from '@cringe-court/modes-solo';
 import { portrait } from '@/art/art';
-import { Alert, Button, Icon, Skeleton, buttonClassName, useToast } from '@/ds';
+import { Alert, Icon, PaperButton, Skeleton, buttonClassName, useToast } from '@/ds';
 import { fontFamily } from '@/ds/tokens';
 import { jurorArt } from '../lib/art';
 import { SoloIcon } from '../lib/SoloIcon';
@@ -181,17 +181,17 @@ export function ShareCard({ summary, onShared }: ShareCardProps) {
       </p>
 
       <div className={styles.actions}>
-        <Button onClick={download} disabled={status !== 'ready'} iconStart={<SoloIcon name="download" />}>
+        <PaperButton onClick={download} disabled={status !== 'ready'} iconStart={<SoloIcon name="download" />}>
           Download PNG
-        </Button>
+        </PaperButton>
         {canNativeShare && (
-          <Button variant="secondary" onClick={nativeShare} disabled={status !== 'ready'} iconStart={<SoloIcon name="share" />}>
+          <PaperButton variant="maroon" onClick={nativeShare} disabled={status !== 'ready'} iconStart={<SoloIcon name="share" />}>
             Share…
-          </Button>
+          </PaperButton>
         )}
-        <Button variant="secondary" onClick={copyCaption} iconStart={<Icon name="copy" />}>
+        <PaperButton variant="maroon" onClick={copyCaption} iconStart={<Icon name="copy" />}>
           Copy caption
-        </Button>
+        </PaperButton>
         <a
           href={`https://x.com/intent/post?text=${encodeURIComponent(summary.shareText)}`}
           target="_blank"

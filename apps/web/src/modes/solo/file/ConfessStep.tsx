@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { CATEGORY_COPY, PRIVATE_NOTES_MAX, STORY_MAX, TITLE_MAX, categoryCopy, redact, validateDraft, type DraftErrors, type SoloDraft } from '@cringe-court/modes-solo';
-import { Alert, Button, Icon, TextArea, TextField, cx } from '@/ds';
+import { Alert, Button, Icon, PaperButton, PaperField, PaperRibbon, TextArea, cx } from '@/ds';
 import styles from './FilePage.module.css';
 
 export interface ConfessStepProps {
@@ -36,9 +36,9 @@ export function ConfessStep({ draft, onChange, onSubmit, serverError }: ConfessS
     <form className={styles.form} onSubmit={submit} noValidate aria-labelledby="confess-title">
       <header className={styles.stepHead}>
         <p className={styles.eyebrow}>Step 1 of 5</p>
-        <h2 id="confess-title" className={styles.stepTitle}>
+        <PaperRibbon as="h2" id="confess-title" className={styles.stepTitle}>
           Confess your crime against common sense
-        </h2>
+        </PaperRibbon>
         <p className={styles.lede}>Counsel Chaos will defend you. Miss Ratio will try to cook you. Three jurors decide.</p>
       </header>
 
@@ -86,7 +86,7 @@ export function ConfessStep({ draft, onChange, onSubmit, serverError }: ConfessS
         )}
       </fieldset>
 
-      <TextField
+      <PaperField
         id="solo-title"
         label="Case title"
         hint="Short and public. The jury reads it first."
@@ -130,7 +130,7 @@ export function ConfessStep({ draft, onChange, onSubmit, serverError }: ConfessS
         onChange={(e) => set({ privateNotes: e.target.value })}
       />
 
-      <TextField
+      <PaperField
         id="solo-names"
         label="Names or handles to hide"
         optional
@@ -144,9 +144,9 @@ export function ConfessStep({ draft, onChange, onSubmit, serverError }: ConfessS
       />
 
       <div className={styles.formActions}>
-        <Button type="submit" size="lg" iconEnd={<Icon name="arrow-right" />}>
+        <PaperButton type="submit" size="lg" iconEnd={<Icon name="arrow-right" />}>
           File the confession
-        </Button>
+        </PaperButton>
         <p className={styles.small}>Free until you take it to a jury. Your draft is saved in this browser.</p>
       </div>
     </form>

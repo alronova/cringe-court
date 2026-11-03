@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { CHARACTER_NAMES, formatUsdc, type ClosedState, type CounselState, type Usdc } from '@cringe-court/core';
 import { PASS_ENABLED, SEGMENT_TITLES, isDemoTerms, outcomePreviews, soloQuote, type SoloSession, type SoloSnapshot } from '@cringe-court/modes-solo';
 import { CANCEL_LABELS } from '@cringe-court/core';
-import { Alert, Amount, Badge, Button, Card, CardBody, CardHeader, CardTitle, EmptyState, ErrorState, Icon, LoadingState, Portrait, Switch, TestnetBadge } from '@/ds';
+import { Alert, Amount, Badge, Button, EmptyState, ErrorState, Icon, LoadingState, PaperButton, PaperPanel, PaperRibbon, Portrait, Switch, TestnetBadge } from '@/ds';
 import styles from './FilePage.module.css';
 
 const DRAFTING_LINES = [
@@ -60,24 +60,27 @@ export function ReviewStep({ session, snap }: { session: SoloSession; snap: Solo
     <div className={styles.review}>
       <header className={styles.stepHead}>
         <p className={styles.eyebrow}>Step 4 of 5</p>
-        <h2 className={styles.stepTitle}>Review the script</h2>
+        <PaperRibbon as="h2" className={styles.stepTitle}>
+          Review the script
+        </PaperRibbon>
         <p className={styles.lede}>
           This is exactly what the jury will watch. Approve it to freeze it (it gets a fingerprint before anyone pays), or send Counsel Chaos back
           for one redraft.
         </p>
       </header>
       {t.balance && (
-        <Card as="section" aria-labelledby="balance-title">
-          <CardHeader eyebrow="Fairness gate (D1)">
-            <CardTitle id="balance-title" as="h3">
-              Both sides got a real argument
-            </CardTitle>
-          </CardHeader>
-          <CardBody>
+        <PaperPanel as="section" edge="cut" elevation={2} aria-labelledby="balance-title">
+          <div className={styles.panelStack}>
+            <header>
+              <p className={styles.eyebrow}>Fairness gate (D1)</p>
+              <h3 id="balance-title" className={styles.panelTitle}>
+                Both sides got a real argument
+              </h3>
+            </header>
             <BalanceMeter scores={t.balance.scores} />
             {t.autoRedraftsUsed > 0 && <p className={styles.small}>The first draft was lopsided, so the court redrafted the weaker side once.</p>}
-          </CardBody>
-        </Card>
+          </div>
+        </PaperPanel>
       )}
       <div className={styles.script}>
         {segments.map((seg) => (
@@ -103,12 +106,12 @@ export function ReviewStep({ session, snap }: { session: SoloSession; snap: Solo
         ))}
       </div>
       <div className={styles.formActions}>
-        <Button size="lg" onClick={() => session.approveDraft()} iconStart={<Icon name="lock" />}>
+        <PaperButton size="lg" onClick={() => session.approveDraft()} iconStart={<Icon name="lock" />}>
           Freeze the transcript
-        </Button>
-        <Button size="lg" variant="secondary" disabled={left <= 0} loading={snap.busy === 'drafting'} onClick={() => void session.redraft()} iconStart={<Icon name="refresh" />}>
+        </PaperButton>
+        <PaperButton size="lg" variant="maroon" disabled={left <= 0} loading={snap.busy === 'drafting'} onClick={() => void session.redraft()} iconStart={<Icon name="refresh" />}>
           {left > 0 ? 'Redraft my defense (1 left)' : 'Redraft used'}
-        </Button>
+        </PaperButton>
         <Button size="lg" variant="ghost" onClick={() => session.withdraw()}>
           Withdraw (free)
         </Button>
@@ -132,21 +135,22 @@ export function PayStep({ session, snap, balance }: { session: SoloSession; snap
     <div className={styles.pay}>
       <header className={styles.stepHead}>
         <p className={styles.eyebrow}>Step 5 of 5</p>
-        <h2 className={styles.stepTitle}>
+        <PaperRibbon as="h2" className={styles.stepTitle}>
           Take it to a jury <TestnetBadge />
-        </h2>
+        </PaperRibbon>
         <p className={styles.lede}>
           Transcript frozen · fingerprint <span className={styles.mono}>{t.transcript ? `${t.transcript.hash.slice(0, 10)}…${t.transcript.hash.slice(-6)}` : '—'}</span>
         </p>
       </header>
       <div className={styles.payGrid}>
-        <Card tone="ornate" as="section" aria-labelledby="price-title">
-          <CardHeader eyebrow="One case, one price">
-            <CardTitle id="price-title" as="h3">
-              {formatUsdc(quote.total)}
-            </CardTitle>
-          </CardHeader>
-          <CardBody>
+        <PaperPanel as="section" edge="cut" elevation={3} backing="gold" aria-labelledby="price-title">
+          <div className={styles.panelStack}>
+            <header>
+              <p className={styles.eyebrow}>One case, one price</p>
+              <h3 id="price-title" className={styles.panelTitle}>
+                {formatUsdc(quote.total)}
+              </h3>
+            </header>
             <dl className={styles.quote}>
               {quote.lines.map((l) => (
                 <div key={l.id}>
@@ -173,15 +177,16 @@ export function PayStep({ session, snap, balance }: { session: SoloSession; snap
               onCheckedChange={() => {}}
               disabled={!PASS_ENABLED}
             />
-          </CardBody>
-        </Card>
-        <Card as="section" aria-labelledby="outcomes-title">
-          <CardHeader eyebrow="Before you pay">
-            <CardTitle id="outcomes-title" as="h3">
-              What happens to your {formatUsdc(quote.total, { unit: false })}
-            </CardTitle>
-          </CardHeader>
-          <CardBody>
+          </div>
+        </PaperPanel>
+        <PaperPanel as="section" edge="cut" elevation={2} aria-labelledby="outcomes-title">
+          <div className={styles.panelStack}>
+            <header>
+              <p className={styles.eyebrow}>Before you pay</p>
+              <h3 id="outcomes-title" className={styles.panelTitle}>
+                What happens to your {formatUsdc(quote.total, { unit: false })}
+              </h3>
+            </header>
             <table className={styles.outcomes}>
               <thead>
                 <tr>
@@ -205,8 +210,8 @@ export function PayStep({ session, snap, balance }: { session: SoloSession; snap
               </tbody>
             </table>
             <p className={styles.small}>The jury pool pays jurors who vote and reveal on time. Prices are fixed for this case once it opens.</p>
-          </CardBody>
-        </Card>
+          </div>
+        </PaperPanel>
       </div>
       {isDemoTerms(t.terms) && (
         <Alert tone="info" title="Demo court">
@@ -220,9 +225,9 @@ export function PayStep({ session, snap, balance }: { session: SoloSession; snap
         </Alert>
       )}
       <div className={styles.formActions}>
-        <Button size="lg" variant="swear" onClick={() => void session.pay()} loading={snap.busy === 'paying'} disabled={short}>
+        <PaperButton size="lg" onClick={() => void session.pay()} loading={snap.busy === 'paying'} disabled={short}>
           Pay {formatUsdc(quote.total)} and open the case
-        </Button>
+        </PaperButton>
         <Button size="lg" variant="ghost" onClick={() => session.withdraw()}>
           Withdraw (free)
         </Button>
@@ -246,9 +251,9 @@ export function DismissedStep({ trial, onRestart }: { trial: ClosedState; onRest
       expression={trial.reason === 'withdrawn' ? 'neutral' : 'shocked'}
       headingLevel={2}
       actions={
-        <Button onClick={onRestart} iconStart={<Icon name="plus" />}>
+        <PaperButton onClick={onRestart} iconStart={<Icon name="plus" />}>
           File a new confession
-        </Button>
+        </PaperButton>
       }
     >
       {reason}. Nothing was charged{trial.caseNumber ? '; any payment is refunded in full' : ''}.

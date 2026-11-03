@@ -12,12 +12,21 @@
 }
 
 .pageTitle {
-  font-size: var(--cc-text-4xl);
-  color: var(--cc-color-accent-text);
+  max-width: 100%;
 }
 
-.pageTitle:focus {
+/* Focus lands on the h1 programmatically on step changes; it is not a control. */
+.pageTitle > h1:focus {
   outline: none;
+}
+
+/* Phones: a smaller banner so long case titles fit in two or three lines and
+   the folded tails clear the stepper below. */
+@media (max-width: 639px) {
+  .pageTitle > h1[data-size] {
+    font-size: var(--cc-text-xl);
+    margin-block-end: var(--cc-space-3);
+  }
 }
 
 .stepper {
@@ -45,11 +54,17 @@
 }
 
 .stepTitle {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--cc-space-3);
-  font-size: var(--cc-text-3xl);
+  max-width: 100%;
+  justify-self: start;
+}
+
+.panelStack {
+  display: grid;
+  gap: var(--cc-space-4);
+}
+
+.panelTitle {
+  font-size: var(--cc-text-xl);
 }
 
 .lede {

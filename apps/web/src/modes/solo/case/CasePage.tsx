@@ -3,7 +3,7 @@ import { Navigate, useParams } from 'react-router';
 import { CANCEL_LABELS, formatCaseNumber } from '@cringe-court/core';
 import { isDemoTerms, soloMode } from '@cringe-court/modes-solo';
 import { useDocumentTitle } from '@/app/useDocumentTitle';
-import { Badge, Button, ButtonLink, EmptyState, Icon, PhaseStepper, TestnetBadge } from '@/ds';
+import { Badge, EmptyState, Icon, PaperButton, PaperButtonLink, PaperRibbon, PhaseStepper, TestnetBadge } from '@/ds';
 import { Courtroom } from '../court/Courtroom';
 import { JuryStage } from '../court/JuryStage';
 import { demoCourt, docketEntry, saveToDocket } from '../lib/demoCourt';
@@ -27,7 +27,7 @@ export function CasePage() {
   const [stored] = useState(() => (session ? null : docketEntry(trialId)));
   const snap = live ?? stored?.snapshot ?? null;
   const [watched, setWatched] = useState(false);
-  const headingRef = useRef<HTMLHeadingElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
   const t = snap?.trial;
   useDocumentTitle(t && 'caseNumber' in t && t.caseNumber ? `${formatCaseNumber(t.caseNumber)} · Solo Court` : 'Solo case');
 
@@ -42,7 +42,7 @@ export function CasePage() {
       firstRender.current = false;
       return;
     }
-    if (t?.stage === 'verdict') headingRef.current?.focus();
+    if (t?.stage === 'verdict') headingRef.current?.querySelector<HTMLElement>('h1')?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phaseKey]);
 
@@ -56,12 +56,12 @@ export function CasePage() {
           expression="shocked"
           actions={
             <>
-              <ButtonLink to={soloPaths.file} iconStart={<Icon name="plus" />}>
+              <PaperButtonLink to={soloPaths.file} iconStart={<Icon name="plus" />}>
                 File a confession
-              </ButtonLink>
-              <ButtonLink to={soloPaths.docket} variant="secondary">
+              </PaperButtonLink>
+              <PaperButtonLink to={soloPaths.docket} variant="maroon">
                 Your docket
-              </ButtonLink>
+              </PaperButtonLink>
             </>
           }
         >
@@ -83,18 +83,20 @@ export function CasePage() {
     <div className={styles.page}>
       <header className={styles.top}>
         <div className={styles.topRow}>
-          <ButtonLink to={soloPaths.docket} variant="ghost" size="sm" iconStart={<Icon name="arrow-left" />}>
+          <PaperButtonLink to={soloPaths.docket} variant="maroon" size="sm" iconStart={<Icon name="arrow-left" />}>
             Docket
-          </ButtonLink>
+          </PaperButtonLink>
           <div className={styles.badges}>
             {caseNumber && <Badge tone="accent">{caseNumber}</Badge>}
             <TestnetBadge />
             {isDemoTerms(t.terms) && <Badge tone="info">Demo court</Badge>}
           </div>
         </div>
-        <h1 ref={headingRef} tabIndex={-1} className={styles.title}>
-          {t.filing.title}
-        </h1>
+        <div ref={headingRef} className={styles.title}>
+          <PaperRibbon as="h1" size="lg" sparks tabIndex={-1}>
+            {t.filing.title}
+          </PaperRibbon>
+        </div>
         {t.stage !== 'closed' && <PhaseStepper steps={STEPS} current={current} label="Case progress" />}
       </header>
 
@@ -115,9 +117,9 @@ export function CasePage() {
             audio={court.audio}
             onFinished={() => setWatched(true)}
             actions={
-              <Button size="sm" variant="secondary" onClick={() => setWatched(true)} iconEnd={<Icon name="arrow-right" />}>
+              <PaperButton size="sm" variant="maroon" onClick={() => setWatched(true)} iconEnd={<Icon name="arrow-right" />}>
                 Skip to the jury
-              </Button>
+              </PaperButton>
             }
           />
         </section>
@@ -128,7 +130,7 @@ export function CasePage() {
       {(t.stage === 'verdict' || t.stage === 'share') && <VerdictPanel snap={{ ...snap, trial: t }} session={session} />}
 
       {t.stage === 'closed' && (
-        <EmptyState title="Case dismissed" headingLevel={2} character="judge" expression="shocked" actions={<ButtonLink to={soloPaths.file}>File again</ButtonLink>}>
+        <EmptyState title="Case dismissed" headingLevel={2} character="judge" expression="shocked" actions={<PaperButtonLink to={soloPaths.file}>File again</PaperButtonLink>}>
           {CANCEL_LABELS[t.reason]}. Your payment is refunded in full.
         </EmptyState>
       )}

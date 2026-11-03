@@ -33,12 +33,21 @@
 }
 
 .title {
-  font-size: var(--cc-text-4xl);
-  color: var(--cc-color-accent-text);
+  max-width: 100%;
 }
 
-.title:focus {
+/* Focus lands on the h1 programmatically on step changes; it is not a control. */
+.title > h1:focus {
   outline: none;
+}
+
+/* Phones: a smaller banner so long case titles fit in two or three lines and
+   the folded tails clear the stepper below. */
+@media (max-width: 639px) {
+  .title > h1[data-size] {
+    font-size: var(--cc-text-xl);
+    margin-block-end: var(--cc-space-3);
+  }
 }
 
 .top nav,
@@ -81,35 +90,6 @@
   gap: var(--cc-space-8);
 }
 
-.verdictHero {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  gap: var(--cc-space-4);
-  padding: var(--cc-space-10) var(--cc-space-4);
-  border-radius: var(--cc-radius-2xl);
-  background:
-    radial-gradient(60% 80% at 50% 30%, color-mix(in srgb, var(--cc-gold-300) 45%, transparent), transparent 70%),
-    var(--cc-color-surface);
-  box-shadow:
-    inset 0 0 0 2px var(--cc-gold-500),
-    inset 0 0 0 6px var(--cc-royal-900),
-    var(--cc-shadow-3);
-  text-align: center;
-}
-
-.verdictHero[data-tone='not-cooked'] {
-  background:
-    radial-gradient(60% 80% at 50% 30%, color-mix(in srgb, var(--cc-green-300) 45%, transparent), transparent 70%),
-    var(--cc-color-surface);
-}
-
-.verdictHero[data-tone='no-verdict'] {
-  background:
-    radial-gradient(60% 80% at 50% 30%, color-mix(in srgb, var(--cc-blue-300) 40%, transparent), transparent 70%),
-    var(--cc-color-surface);
-}
-
 .headline {
   font-family: var(--cc-font-display);
   font-size: var(--cc-text-2xl);
@@ -147,27 +127,6 @@
   .votes {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-.vote {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--cc-space-3);
-  align-items: center;
-  padding: var(--cc-space-3);
-  border-radius: var(--cc-radius-lg);
-  background: var(--cc-color-surface);
-  box-shadow: var(--cc-shadow-1);
-}
-
-.vote > :last-child {
-  grid-column: 2;
-  justify-self: start;
-}
-
-.vote p {
-  font-size: var(--cc-text-sm);
-  color: var(--cc-color-text-muted);
 }
 
 .voteSprite {
@@ -256,12 +215,14 @@
 }
 
 .docketCard {
+  position: relative;
+}
+
+.docketBody {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--cc-space-5);
-  padding: var(--cc-space-5);
   align-items: center;
-  position: relative;
 }
 
 .docketTitle {
@@ -274,6 +235,7 @@
 }
 
 .docketCard .docketLink::after {
+  z-index: 1;
   content: '';
   position: absolute;
   inset: 0;

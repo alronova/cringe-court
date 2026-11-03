@@ -35,3 +35,15 @@ The web app's demo court wires `DemoCounsel`, the in-memory Arc twin
 counsel service (`@cringe-court/ai`), the Arc contract adapter (v3/p5) and the
 World ID verified pool: `SoloSession` only talks to ports. Without a `jury`
 adapter the session expects seats from the real pool.
+
+## The room behind the trial (TrialView seam)
+
+`apps/web/src/modes/solo/court/Courtroom.tsx` owns the dialogue, transport,
+transcript and the screen-reader live region; the room behind it is a
+`TrialView` (`court/TrialView.ts`): a component that receives one beat at a time
+(`line`, `index`, `cast`, `reducedMotion`) and reports `onReady` / `onError`.
+The illustrated stage is always underneath, so a view that fails to load drops
+back to it without interrupting the trial. Today the default view is the voxel
+courtroom (`@cringe-court/scene`); the first-person roaming courtroom
+(`<RoamCourtroom>`, branch `v3/roam-fp`) plugs in by wrapping
+`roam.runBeat(line)` in a component with the same props.

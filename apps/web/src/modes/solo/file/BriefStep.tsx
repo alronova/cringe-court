@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import type { EvidenceState, PublicExhibit } from '@cringe-court/core';
 import { ANGLE_MAX, REDACTION_LABELS, soloMode, type SoloSession, type SoloSnapshot } from '@cringe-court/modes-solo';
-import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, Icon, Portrait, Select, Skeleton, TextArea, TextField, cx } from '@/ds';
+import { Alert, Badge, Button, Icon, PaperButton, PaperField, PaperPanel, PaperRibbon, Portrait, Select, Skeleton, TextArea, cx } from '@/ds';
 import { Courtroom } from '../court/Courtroom';
 import styles from './FilePage.module.css';
 
@@ -42,18 +42,21 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
     <div className={styles.brief}>
       <header className={styles.stepHead}>
         <p className={styles.eyebrow}>Step 2 of 5</p>
-        <h2 className={styles.stepTitle}>Brief your lawyer</h2>
+        <PaperRibbon as="h2" className={styles.stepTitle}>
+          Brief your lawyer
+        </PaperRibbon>
         <p className={styles.lede}>Check what the court will see, add evidence if you have any, then give Counsel Chaos one angle to run with.</p>
       </header>
 
       <div className={styles.briefGrid}>
-        <Card tone="parchment" as="section" aria-labelledby="public-title">
-          <CardHeader eyebrow="Public record">
-            <CardTitle id="public-title" as="h3">
-              What Miss Ratio and the jury will read
-            </CardTitle>
-          </CardHeader>
-          <CardBody>
+        <PaperPanel as="section" edge="cut" elevation={2} aria-labelledby="public-title">
+          <div className={styles.panelStack}>
+            <header>
+              <p className={styles.eyebrow}>Public record</p>
+              <h3 id="public-title" className={styles.panelTitle}>
+                What Miss Ratio and the jury will read
+              </h3>
+            </header>
             <p className={styles.publicTitle}>“{t.filing.title}”</p>
             <p className={styles.publicStory}>{side.story}</p>
             {snap.redactions.length > 0 ? (
@@ -70,16 +73,17 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
             <Button size="sm" variant="ghost" onClick={() => session.withdraw()}>
               Start over
             </Button>
-          </CardBody>
-        </Card>
+          </div>
+        </PaperPanel>
 
-        <Card as="section" aria-labelledby="evidence-title">
-          <CardHeader eyebrow={`Optional · ${exhibitsLeft} of ${t.rules.maxExhibits} left`}>
-            <CardTitle id="evidence-title" as="h3">
-              Evidence locker
-            </CardTitle>
-          </CardHeader>
-          <CardBody>
+        <PaperPanel as="section" edge="cut" elevation={2} aria-labelledby="evidence-title">
+          <div className={styles.panelStack}>
+            <header>
+              <p className={styles.eyebrow}>{`Optional · ${exhibitsLeft} of ${t.rules.maxExhibits} left`}</p>
+              <h3 id="evidence-title" className={styles.panelTitle}>
+                Evidence locker
+              </h3>
+            </header>
             {t.exhibits.length > 0 && (
               <ol className={styles.exhibits} role="list">
                 {t.exhibits.map((x, i) => (
@@ -109,15 +113,15 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
                     { value: 'link', label: 'Link (redacted)' },
                   ]}
                 />
-                <TextField label="Exhibit title" value={exhibit.title} maxLength={80} onChange={(e) => setExhibit({ ...exhibit, title: e.target.value })} />
+                <PaperField label="Exhibit title" value={exhibit.title} maxLength={80} onChange={(e) => setExhibit({ ...exhibit, title: e.target.value })} />
                 <TextArea label="What it shows" value={exhibit.body} maxLength={400} rows={2} onChange={(e) => setExhibit({ ...exhibit, body: e.target.value })} />
                 <Button type="submit" size="sm" variant="secondary" iconStart={<Icon name="plus" />}>
                   Add exhibit
                 </Button>
               </form>
             )}
-          </CardBody>
-        </Card>
+          </div>
+        </PaperPanel>
       </div>
 
       <section className={styles.angles} aria-labelledby="angle-title">
@@ -138,9 +142,9 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
               <Skeleton height="6rem" />
             </div>
           ) : (
-            <Button variant="secondary" onClick={() => void session.suggestAngles()} iconStart={<Icon name="sparkle" />}>
+            <PaperButton variant="maroon" onClick={() => void session.suggestAngles()} iconStart={<Icon name="sparkle" />}>
               Ask Counsel Chaos for angles
-            </Button>
+            </PaperButton>
           )
         ) : (
           <fieldset className={styles.angleFieldset}>
@@ -183,7 +187,7 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
       )}
 
       <div className={styles.formActions}>
-        <Button
+        <PaperButton
           size="lg"
           disabled={!angleText.trim() || angleText.trim().length > ANGLE_MAX}
           loading={busy === 'drafting'}
@@ -193,16 +197,16 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
           iconEnd={<Icon name="arrow-right" />}
         >
           Approve and send to counsel
-        </Button>
+        </PaperButton>
         {snap.teaser ? (
           !watching && (
-            <Button variant="secondary" size="lg" onClick={() => setWatching(true)}>
+            <PaperButton variant="maroon" size="lg" onClick={() => setWatching(true)}>
               Watch the teaser again
-            </Button>
+            </PaperButton>
           )
         ) : (
-          <Button
-            variant="secondary"
+          <PaperButton
+            variant="maroon"
             size="lg"
             disabled={!angleText.trim() || teaserAllowance.remaining === 0}
             loading={busy === 'teaser'}
@@ -213,7 +217,7 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
             }}
           >
             {teaserAllowance.remaining > 0 ? 'Watch the free teaser' : 'Free teaser used today'}
-          </Button>
+          </PaperButton>
         )}
         <p className={styles.small}>
           Free teasers today: {teaserAllowance.remaining} of {teaserAllowance.limit}. Approving freezes the public text above.
