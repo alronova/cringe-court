@@ -1,9 +1,10 @@
 import { CHARACTER_NAMES, SPEAKER_CHARACTER, type CourtLine, type Segment } from '@cringe-court/core';
 import type { CaseDetail, LogEntry } from '@cringe-court/modes-grand-jury';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, CardTitle, Icon, Portrait, cx, useMotion } from '@/ds';
-import { ago } from '../lib';
+import { Button, Icon, Portrait, cx, useMotion } from '@/ds';
+import { ago, portraitOf } from '../lib';
 import styles from '../GrandJury.module.css';
+import { CourtPanel } from './parts';
 
 const SEGMENT_LABEL: Record<Segment, string> = {
   'call-to-order': 'Call to order',
@@ -25,7 +26,7 @@ const EXPRESSION: Partial<Record<NonNullable<CourtLine['beat']>, 'smug' | 'shock
 };
 
 function Line({ line, detail }: { line: CourtLine; detail: CaseDetail }) {
-  const character = SPEAKER_CHARACTER[line.speaker];
+  const character = portraitOf(SPEAKER_CHARACTER[line.speaker]);
   const exhibit = line.exhibitId ? detail.file.sources.find((s) => s.id === line.exhibitId) : undefined;
   const position = line.bench !== undefined ? detail.ballot[line.bench] : null;
   return (
@@ -33,7 +34,7 @@ function Line({ line, detail }: { line: CourtLine; detail: CaseDetail }) {
       <Portrait character={character} expression={line.beat ? (EXPRESSION[line.beat] ?? 'neutral') : 'neutral'} size="sm" ring={line.bench === 0 ? 'accent' : line.bench === 1 ? 'side-a' : 'highlight'} alt="" />
       <div className={styles.bubble}>
         <p className={styles.lineMeta}>
-          <span className={styles.lineSpeaker}>{CHARACTER_NAMES[character]}</span>
+          <span className={styles.lineSpeaker}>{CHARACTER_NAMES[SPEAKER_CHARACTER[line.speaker]]}</span>
           {position && <span className={styles.linePosition}>for {position}</span>}
           <span className={styles.lineSegment}>{SEGMENT_LABEL[line.segment]}</span>
         </p>
@@ -71,20 +72,23 @@ export function ArgumentFeed({ detail }: { detail: CaseDetail }) {
   }, [shown, playing, reduced]);
 
   return (
-    <Card as="section" tone="raised" aria-labelledby="feed-title" className={styles.feedCard}>
-      <CardHeader eyebrow={detail.transcriptTeaser ? 'Free teaser' : 'The hearing'}>
-        <div className={styles.feedHead}>
-          <CardTitle id="feed-title" as="h2">
-            The arguments
-          </CardTitle>
-          {!reduced && lines.length > 1 && (
-            <Button size="sm" variant="ghost" iconStart={<Icon name={playing ? 'close' : 'refresh'} />} onClick={() => setShown(playing ? lines.length : 1)}>
-              {playing ? 'Show all' : 'Play the hearing'}
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardBody>
+    <CourtPanel
+      id="feed-title"
+      tone="cream"
+      edge="torn"
+      className={styles.feedCard}
+      eyebrow={detail.transcriptTeaser ? 'Free teaser' : 'Full transcript'}
+      title="The arguments"
+      icon="megaphone"
+      action={
+        !reduced &&
+        lines.length > 1 && (
+          <Button size="sm" variant="ghost" iconStart={<Icon name={playing ? 'close' : 'refresh'} />} onClick={() => setShown(playing ? lines.length : 1)}>
+            {playing ? 'Show all' : 'Replay as a feed'}
+          </Button>
+        )
+      }
+    >
         <ol ref={listRef} className={styles.feed} aria-live={playing ? 'polite' : 'off'} aria-label="Transcript">
           {lines.slice(0, shown).map((l) => (
             <Line key={l.id} line={l} detail={detail} />
@@ -106,8 +110,7 @@ export function ArgumentFeed({ detail }: { detail: CaseDetail }) {
           </code>{' '}
           recorded on the ledger before any vote.
         </p>
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }
 
@@ -132,13 +135,7 @@ export function CourtRecord({ log, now, limit = 12 }: { log: readonly LogEntry[]
   const items = [...log].reverse();
   const visible = all ? items : items.slice(0, limit);
   return (
-    <Card as="section" aria-labelledby="record-title">
-      <CardHeader eyebrow="Public, on the ledger">
-        <CardTitle id="record-title" as="h2">
-          Court record
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
+    <CourtPanel id="record-title" tone="kraft" elevation={1} eyebrow="Public, on the ledger" title="Court record">
         <ol className={styles.record}>
           {visible.map((l) => (
             <li key={l.id} className={cx(styles.recordItem)} data-kind={l.kind}>
@@ -157,7 +154,6 @@ export function CourtRecord({ log, now, limit = 12 }: { log: readonly LogEntry[]
             {all ? 'Show recent only' : `Show all ${items.length} entries`}
           </Button>
         )}
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }

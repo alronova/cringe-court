@@ -1,4 +1,6 @@
 import type { CaseAudioEvent } from '@cringe-court/audio';
+import type { CharacterId as CoreCharacterId } from '@cringe-court/core';
+import type { CharacterId } from '@/art/art';
 import type { DocketEntry, DocketStatus, SharePalette } from '@cringe-court/modes-grand-jury';
 import type { BadgeTone } from '@/ds';
 
@@ -114,4 +116,9 @@ export function sound(event: CaseAudioEvent): void {
 /** Verdict stinger for a Grand Jury outcome (bench 0 / bench 1 / none). */
 export function verdictSound(kind: 'ballot-0' | 'ballot-1' | 'no-verdict'): void {
   sound({ type: 'verdict.read', outcome: kind === 'no-verdict' ? 'no-verdict' : kind === 'ballot-0' ? 'side-a' : 'side-b' });
+}
+
+/** Portrait for a transcript speaker. Grand Jury has no player, so `player` falls back to a plain Side A cut-out. */
+export function portraitOf(c: CoreCharacterId): CharacterId {
+  return c === 'player' ? 'side-a' : c;
 }

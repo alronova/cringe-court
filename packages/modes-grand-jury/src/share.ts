@@ -99,9 +99,16 @@ export function wrap(text: string, width: number, lines: number): string[] {
 
 /** 1200×630 Open Graph-sized card. Pure string; no DOM needed. */
 export function renderShareSvg(card: ShareCard, p: SharePalette, fonts = { display: 'Fraunces, Georgia, serif', pixel: '"Pixelify Sans", monospace', body: '"Space Grotesk", system-ui, sans-serif' }): string {
-  const q = wrap(`“${card.question}”`, 30, 3);
+  // Left column (x 80…620) holds the question; the stamp owns the right (660…1100).
+  const q = wrap(`“${card.question}”`, 19, 3);
+  const sub = wrap(card.subline, 40, 2);
+  const gallery = card.gallery ? wrap(card.gallery, 34, 2) : [];
+  const clip = (t: string, n: number) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
   const stampColor = card.tone === 'verdict' ? p.maroon : card.tone === 'no-verdict' ? p.teal : card.tone === 'cancelled' ? p.muted : p.gold;
-  const headline = wrap(card.headline, 18, 2);
+  const headline = wrap(card.headline, 13, 2);
+  // Heavy caps run about 0.68 em per glyph; keep the longest line inside the 440-wide stamp.
+  const longest = Math.max(...headline.map((l) => l.length));
+  const stampSize = Math.min(58, Math.floor(400 / (longest * 0.68)));
   const pips: string[] = [];
   if (card.tally) {
     const votes = [...Array(card.tally[0]).fill(0), ...Array(card.tally[1]).fill(1)] as number[];
@@ -112,7 +119,12 @@ export function renderShareSvg(card: ShareCard, p: SharePalette, fonts = { displ
     }
   }
   const legend = card.tally
-    ? `<text x="700" y="525" font-family=${JSON.stringify(fonts.body)} font-size="22" fill="${p.ink}"><tspan fill="${p.maroon}" font-weight="700">● ${esc(card.ballot[0])} ${card.tally[0]}</tspan><tspan dx="24" fill="${p.teal}" font-weight="700">● ${esc(card.ballot[1])} ${card.tally[1]}</tspan></text>`
+    ? [0, 1]
+        .map(
+          (b) =>
+            `<text x="700" y="${516 + b * 26}" font-family="${esc(fonts.body)}" font-size="21" font-weight="700" fill="${b === 0 ? p.maroon : p.teal}">● ${esc(clip(card.ballot[b]!, 26))} ${card.tally![b]}</text>`,
+        )
+        .join('')
     : '';
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="${esc(`${card.caseLabel}: ${card.question} ${card.headline}`)}">`,
@@ -120,21 +132,21 @@ export function renderShareSvg(card: ShareCard, p: SharePalette, fonts = { displ
     `<rect x="24" y="24" width="1152" height="582" rx="28" fill="${p.parchment}" stroke="${p.gold}" stroke-width="8"/>`,
     `<rect x="44" y="44" width="1112" height="542" rx="18" fill="none" stroke="${p.maroon}" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/>`,
     `<rect x="80" y="70" width="380" height="54" rx="27" fill="${p.maroon}"/>`,
-    `<text x="270" y="106" text-anchor="middle" font-family=${JSON.stringify(fonts.pixel)} font-size="26" fill="${p.goldLight}">GRAND JURY · ${esc(card.caseLabel.replace('CASE ', ''))}</text>`,
-    `<text x="80" y="180" font-family=${JSON.stringify(fonts.body)} font-size="26" font-weight="700" letter-spacing="3" fill="${p.muted}">${esc(card.title.toUpperCase())}</text>`,
-    ...q.map((l, i) => `<text x="80" y="${250 + i * 64}" font-family=${JSON.stringify(fonts.display)} font-size="56" font-weight="800" fill="${p.ink}">${esc(l)}</text>`),
+    `<text x="270" y="106" text-anchor="middle" font-family="${esc(fonts.pixel)}" font-size="26" fill="${p.goldLight}">GRAND JURY · ${esc(card.caseLabel.replace('CASE ', ''))}</text>`,
+    `<text x="80" y="180" font-family="${esc(fonts.body)}" font-size="26" font-weight="700" letter-spacing="3" fill="${p.muted}">${esc(card.title.toUpperCase())}</text>`,
+    ...q.map((l, i) => `<text x="80" y="${240 + i * 58}" font-family="${esc(fonts.display)}" font-size="50" font-weight="800" fill="${p.ink}">${esc(l)}</text>`),
     `<g transform="rotate(-6 880 250)">`,
     `<rect x="660" y="${headline.length > 1 ? 150 : 180}" width="440" height="${headline.length > 1 ? 190 : 130}" rx="16" fill="none" stroke="${stampColor}" stroke-width="10"/>`,
     ...headline.map(
       (l, i) =>
-        `<text x="880" y="${(headline.length > 1 ? 232 : 265) + i * 72}" text-anchor="middle" font-family=${JSON.stringify(fonts.display)} font-size="58" font-weight="900" fill="${stampColor}">${esc(l)}</text>`,
+        `<text x="880" y="${(headline.length > 1 ? 232 : 265) + i * 72}" text-anchor="middle" font-family="${esc(fonts.display)}" font-size="${stampSize}" font-weight="900" fill="${stampColor}">${esc(l)}</text>`,
     ),
     `</g>`,
-    `<text x="80" y="${250 + q.length * 64 + 20}" font-family=${JSON.stringify(fonts.body)} font-size="30" fill="${p.ink}">${esc(card.subline)}</text>`,
+    ...sub.map((l, i) => `<text x="80" y="${240 + (q.length - 1) * 58 + 44 + i * 34}" font-family="${esc(fonts.body)}" font-size="26" fill="${p.ink}">${esc(l)}</text>`),
     ...pips,
     legend,
-    card.gallery ? `<text x="80" y="520" font-family=${JSON.stringify(fonts.pixel)} font-size="28" fill="${p.green}">${esc(card.gallery)}</text>` : '',
-    `<text x="80" y="566" font-family=${JSON.stringify(fonts.body)} font-size="22" fill="${p.muted}">${esc(card.url)} · TESTNET · Your Honor, bro is cooked.</text>`,
+    ...gallery.map((l, i) => `<text x="80" y="${(gallery.length > 1 ? 494 : 522) + i * 28}" font-family="${esc(fonts.pixel)}" font-size="22" fill="${p.green}">${esc(l)}</text>`),
+    `<text x="80" y="566" font-family="${esc(fonts.body)}" font-size="22" fill="${p.muted}">${esc(card.url)} · TESTNET · Your Honor, bro is cooked.</text>`,
     `</svg>`,
   ].join('');
 }

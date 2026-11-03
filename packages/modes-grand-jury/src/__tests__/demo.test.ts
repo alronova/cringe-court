@@ -166,6 +166,37 @@ describe('simulation', () => {
     expect(e.status).toBe('in-session');
   });
 
+  it('catchUp before a skip: the crowd seals and opens on time, so skipping never changes the outcome', async () => {
+    const { d, advance, bySlug } = await demo();
+    for (let t = 0; t < 300; t += 5) {
+      advance(5);
+      await d.sim.tick();
+    }
+    const n = (await bySlug('pineapple-pizza')).caseNumber;
+    await d.court.screen(n);
+    await d.court.requestSeat(n);
+    expect((await d.court.acceptSeat(n)).ok).toBe(true);
+    expect((await d.court.seal(n, 0)).ok).toBe(true);
+    const skipToDeadline = async () => {
+      const e = await bySlug('pineapple-pizza');
+      await d.sim.catchUp(n);
+      d.clock.skip(e.phaseEndsAt! - d.court.now() + 1);
+      await d.sim.tick();
+    };
+    await skipToDeadline();
+    expect((await bySlug('pineapple-pizza')).status).toBe('opening-scrolls');
+    expect((await bySlug('pineapple-pizza')).seats.sealed).toBe(7);
+    expect((await d.court.reveal(n)).ok).toBe(true);
+    await skipToDeadline();
+    expect((await d.court.settle(n)).ok).toBe(true);
+    const e = await bySlug('pineapple-pizza');
+    expect(e.seats.opened).toBe(7);
+    expect(e.status).toBe('verdict');
+    expect(e.verdict!.tally[0] + e.verdict!.tally[1]).toBe(7);
+    const v = (await d.court.detail(n))!.viewer;
+    expect(v.claim!.amount).toBe(usdc('2.10'));
+  });
+
   it('is deterministic: two courts give the same verdicts and gallery totals', async () => {
     const a = await demo();
     const b = await demo();

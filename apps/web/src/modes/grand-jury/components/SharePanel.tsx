@@ -1,8 +1,9 @@
 import { buildShareCard, renderShareSvg, shareText, type DocketEntry } from '@cringe-court/modes-grand-jury';
 import { useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, CardTitle, Icon, useToast } from '@/ds';
+import { Button, Icon, PaperButton, useToast } from '@/ds';
 import { paths, sharePalette } from '../lib';
 import styles from '../GrandJury.module.css';
+import { CourtPanel } from './parts';
 
 function download(href: string, name: string) {
   const a = document.createElement('a');
@@ -70,28 +71,21 @@ export function SharePanel({ entry }: { entry: DocketEntry }) {
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   return (
-    <Card as="section" aria-labelledby="share-title" className={styles.shareCard}>
-      <CardHeader eyebrow={card.tone === 'live' ? 'Rally the crowd' : 'The screenshot moment'}>
-        <CardTitle id="share-title" as="h2">
-          Share this case
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
+    <CourtPanel id="share-title" tone="kraft" elevation={1} className={styles.shareCard} eyebrow={card.tone === 'live' ? 'Rally the crowd' : 'The screenshot moment'} title="Share this case">
         <img className={styles.sharePreview} src={src} width={1200} height={630} alt={`Share card: ${card.caseLabel}, ${card.question} ${card.headline}. ${card.subline}`} />
         <div className={styles.buttonRow}>
           {canShare && (
-            <Button variant="primary" onClick={share} iconStart={<Icon name="external" />}>
+            <PaperButton onClick={share} iconStart={<Icon name="external" />}>
               Share
-            </Button>
+            </PaperButton>
           )}
-          <Button variant={canShare ? 'secondary' : 'primary'} onClick={copy} iconStart={<Icon name="copy" />}>
+          <Button variant={canShare ? 'secondary' : 'gold'} onClick={copy} iconStart={<Icon name="copy" />}>
             Copy text + link
           </Button>
           <Button variant="ghost" onClick={png} loading={busy} iconStart={<Icon name="arrow-right" />}>
             Download image
           </Button>
         </div>
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }

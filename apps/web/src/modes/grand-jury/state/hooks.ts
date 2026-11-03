@@ -79,3 +79,13 @@ export function useAction<A extends unknown[], T>(fn: (...args: A) => Promise<Ac
   const reset = useCallback(() => setSt({ state: 'idle' }), []);
   return { status: st, pending: st.state === 'pending', error: st.state === 'done' && !st.result.ok ? st.result.message : null, run, reset };
 }
+
+/** Every case with its viewer state, for "My court". */
+export function useAllCases() {
+  const { demo } = useCourtContext();
+  return useCourtQuery<readonly CaseDetail[]>(async () => {
+    const list = await demo.court.list();
+    const details = await Promise.all(list.map((e) => demo.court.detail(e.caseNumber)));
+    return details.filter((d): d is CaseDetail => d !== null);
+  }, [demo]);
+}

@@ -144,3 +144,14 @@ describe('wrap', () => {
     expect(wrap('short', 10, 1)).toEqual(['short']);
   });
 });
+
+describe('renderShareSvg markup', () => {
+  it('is well-formed: every attribute is double-quoted with no raw quote inside (font names are escaped)', () => {
+    const p: SharePalette = { parchment: 'a', parchmentDeep: 'b', ink: 'c', muted: 'd', maroon: 'e', maroonDeep: 'f', gold: 'g', goldLight: 'h', teal: 'i', green: 'j' };
+    const svg = renderShareSvg(buildShareCard(entries[0]!, URL_), p);
+    const tags = [...svg.matchAll(/<(\w+)((?:\s[^<>]*)?)\/?>/g)];
+    expect(tags.length).toBeGreaterThan(10);
+    for (const [, , attrs] of tags) expect(attrs!.trim().replace(/\/$/, '')).toMatch(/^(?:[\w:-]+="[^"<]*"\s*)*$/);
+    expect(svg).toContain('font-family="&quot;Pixelify Sans&quot;, monospace"');
+  });
+});

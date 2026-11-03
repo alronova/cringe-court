@@ -1,9 +1,10 @@
 import { formatUsdc, type Usdc } from '@cringe-court/core';
 import type { CaseDetail, Disclosure } from '@cringe-court/modes-grand-jury';
 import { useEffect, useRef } from 'react';
-import { Amount, Card, CardBody, CardHeader, CardTitle, Icon, Stamp } from '@/ds';
+import { Amount, Icon, Stamp } from '@/ds';
 import { verdictSound } from '../lib';
 import styles from '../GrandJury.module.css';
+import { CourtPanel } from './parts';
 
 /** Seven pips, coloured by the revealed side; grey for jurors who never revealed. */
 function TallyPips({ tally, appointed, ballot }: { tally: readonly [number, number]; appointed: number; ballot: readonly [string, string] }) {
@@ -85,14 +86,8 @@ export function VerdictPanel({ detail }: { detail: CaseDetail }) {
 
   if (detail.status === 'cancelled') {
     return (
-      <Card as="section" tone="parchment" aria-labelledby="verdict-title" className={styles.verdictCard} data-outcome="cancelled">
-        <CardHeader eyebrow="Dismissed">
-          <CardTitle id="verdict-title" as="h2">
-            The court never sat
-          </CardTitle>
-        </CardHeader>
-        <CardBody>
-          <div className={styles.verdictStamp}>
+      <CourtPanel id="verdict-title" tone="cream" className={styles.verdictCard} data-outcome="cancelled" eyebrow="Dismissed" title="The court never sat">
+          <div className={styles.verdictStamp} style={{ ['--_len' as string]: 14 }}>
             <Stamp tone="no-verdict" size="lg" animate sub="Full refunds">
               Case dismissed
             </Stamp>
@@ -104,8 +99,7 @@ export function VerdictPanel({ detail }: { detail: CaseDetail }) {
               <DisclosureList d={detail.disclosure} />
             </details>
           )}
-        </CardBody>
-      </Card>
+    </CourtPanel>
     );
   }
   if (!v) return null;
@@ -113,15 +107,20 @@ export function VerdictPanel({ detail }: { detail: CaseDetail }) {
   const winners = won === null ? 0 : v.tally[won];
 
   return (
-    <Card as="section" tone="ornate" aria-labelledby="verdict-title" className={styles.verdictCard} data-outcome={won === null ? 'none' : `bench-${won}`}>
-      <CardHeader eyebrow={`${detail.label} · Verdict`}>
-        <CardTitle id="verdict-title" as="h2">
-          {won === null ? 'No verdict' : `${winners} of ${v.appointed} strangers agreed`}
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
-        <div className={styles.verdictStamp}>
-          <Stamp tone={won === 0 ? 'guilty' : won === 1 ? 'side-a' : 'no-verdict'} size="xl" animate sub={won === null ? `Needed ${detail.terms.threshold} of ${v.appointed}` : `${v.tally[0]}–${v.tally[1]}`}>
+    <CourtPanel
+      id="verdict-title"
+      tone="maroon"
+      backing="gold"
+      elevation={3}
+      unfold
+      className={styles.verdictCard}
+      data-outcome={won === null ? 'none' : `bench-${won}`}
+      eyebrow={`${detail.label} · Verdict`}
+      title={won === null ? 'No verdict' : `${winners} of ${v.appointed} strangers agreed`}
+      icon="gavel"
+    >
+        <div className={styles.verdictStamp} style={{ ['--_len' as string]: won === null ? 10 : v.label.length }}>
+          <Stamp tone={won === 0 ? 'guilty' : won === 1 ? 'side-a' : 'no-verdict'} size="lg" animate sub={won === null ? `Needed ${detail.terms.threshold} of ${v.appointed}` : `${v.tally[0]}–${v.tally[1]}`}>
             {won === null ? 'No verdict' : v.label}
           </Stamp>
         </div>
@@ -145,7 +144,6 @@ export function VerdictPanel({ detail }: { detail: CaseDetail }) {
             <DisclosureList d={detail.disclosure} />
           </details>
         )}
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }

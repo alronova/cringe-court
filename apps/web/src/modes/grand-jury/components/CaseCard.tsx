@@ -1,18 +1,28 @@
 import { CATEGORIES } from '@cringe-court/core';
 import type { DocketEntry } from '@cringe-court/modes-grand-jury';
 import { Link } from 'react-router';
-import { Countdown, Icon, Stamp, cx } from '@/ds';
-import { deadlineLabel, paths } from '../lib';
+import { Countdown, Icon, PaperPanel, Stamp, cx } from '@/ds';
+import { deadlineLabel, isClosed, paths } from '../lib';
 import styles from '../GrandJury.module.css';
 import { BallotChip, FundingMeter, JuryBox, StatusBadge } from './parts';
 
 /** One case on the docket. The whole card is the link; inner content stays plain text. */
 export function CaseCard({ entry, nowMs }: { entry: DocketEntry; nowMs: number }) {
   const e = entry;
-  const closed = e.status === 'verdict' || e.status === 'mistrial' || e.status === 'cancelled';
+  const closed = isClosed(e.status);
   const titleId = `case-${e.caseNumber}-title`;
   return (
-    <article className={cx(styles.caseCard, closed && styles.caseCardClosed)} data-status={e.status} aria-labelledby={titleId}>
+    <PaperPanel
+      as="article"
+      tone={closed ? 'kraft' : 'cream'}
+      edge="cut"
+      elevation={closed ? 1 : 2}
+      backing={e.sponsor ? 'gold' : 'none'}
+      padding="md"
+      className={cx(styles.caseCard, closed && styles.caseCardClosed)}
+      data-status={e.status}
+      aria-labelledby={titleId}
+    >
       <header className={styles.caseCardHead}>
         <span className={styles.caseLabel}>{e.label}</span>
         <StatusBadge status={e.status} />
@@ -56,7 +66,7 @@ export function CaseCard({ entry, nowMs }: { entry: DocketEntry; nowMs: number }
             <Stamp tone="no-verdict" size="sm">
               No verdict
             </Stamp>
-            <span className={styles.tallyText}>Everyone refunded</span>
+            <span className={styles.tallyText}>Summoners refunded</span>
           </div>
         )}
         {e.status === 'cancelled' && <p className={styles.caseCardNote}>Dismissed before trial. Every summoner can claim a full refund.</p>}
@@ -76,6 +86,6 @@ export function CaseCard({ entry, nowMs }: { entry: DocketEntry; nowMs: number }
           </span>
         )}
       </footer>
-    </article>
+    </PaperPanel>
   );
 }

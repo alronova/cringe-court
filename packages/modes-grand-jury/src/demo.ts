@@ -398,6 +398,29 @@ export class DemoSimulation {
     }
   }
 
+  /**
+   * Before the demo clock jumps to a deadline: every simulated juror does what
+   * they would have done inside the window (seal, or open their scroll), so a
+   * skip shortens the wait without changing the outcome. Scripted absentees
+   * still miss the reveal, and the viewer is never acted for.
+   */
+  async catchUp(n: CaseNumber): Promise<void> {
+    const c = await this.root.getCase(n);
+    if (!c) return;
+    if (c.phase === 'commit') {
+      if (!this.#hasPlan(c)) await this.planVotes(n, this.clock.now());
+      for (const s of c.seats) {
+        const b = this.#ballots.get(`${n}:${s.juror.toLowerCase()}`);
+        if (b && !s.committed) await this.root.as(s.juror).commit(n, this.root.commitmentFor(n, s.juror, b.choice, b.salt));
+      }
+    } else if (c.phase === 'reveal') {
+      for (const s of c.seats) {
+        const b = this.#ballots.get(`${n}:${s.juror.toLowerCase()}`);
+        if (b && s.committed && !s.revealed && b.revealAt !== null) await this.root.as(s.juror).reveal(n, b.choice, b.salt);
+      }
+    }
+  }
+
   /** One step of the world. The app calls this every second; overlapping calls are dropped. */
   async tick(at?: number): Promise<void> {
     if (this.#busy) return;

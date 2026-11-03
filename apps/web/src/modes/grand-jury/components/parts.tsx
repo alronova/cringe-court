@@ -1,8 +1,61 @@
 import { formatUsdc, type Usdc } from '@cringe-court/core';
 import { STATUS_LABELS, type DocketEntry, type DocketStatus } from '@cringe-court/modes-grand-jury';
-import { Badge, Icon, Portrait, cx } from '@/ds';
+import type { ReactNode } from 'react';
+import { Badge, Icon, PaperPanel, Portrait, cx, type IconName, type PaperEdge, type PaperTone } from '@/ds';
 import { STATUS_TONE } from '../lib';
 import styles from '../GrandJury.module.css';
+
+/**
+ * Every Grand Jury panel: a sheet of card with an eyebrow, a heading and a body.
+ * `tone="maroon"` is the velvet card for the moment that matters (the verdict,
+ * the ballot); `cream` is the default; `kraft` is quiet background material.
+ */
+export function CourtPanel({
+  id,
+  eyebrow,
+  title,
+  icon,
+  action,
+  tone = 'cream',
+  edge = 'cut',
+  elevation = 2,
+  backing = 'none',
+  unfold,
+  className,
+  children,
+  ...rest
+}: {
+  id: string;
+  eyebrow?: ReactNode;
+  title: ReactNode;
+  icon?: IconName;
+  /** Right of the heading (a small button). */
+  action?: ReactNode;
+  tone?: PaperTone;
+  edge?: PaperEdge;
+  elevation?: 0 | 1 | 2 | 3 | 4;
+  backing?: 'none' | 'gold' | 'maroon' | 'cream';
+  unfold?: boolean;
+  className?: string;
+  children: ReactNode;
+  'data-outcome'?: string;
+}) {
+  return (
+    <PaperPanel as="section" tone={tone} edge={edge} elevation={elevation} backing={backing} unfold={unfold} padding="md" aria-labelledby={id} className={cx(styles.panel, className)} {...rest}>
+      <header className={styles.panelHead}>
+        <div className={styles.panelHeadText}>
+          {eyebrow && <p className={styles.panelEyebrow}>{eyebrow}</p>}
+          <h2 id={id} className={styles.panelTitle}>
+            {icon && <Icon name={icon} className={styles.panelTitleIcon} />}
+            {title}
+          </h2>
+        </div>
+        {action}
+      </header>
+      <div className={styles.panelBody}>{children}</div>
+    </PaperPanel>
+  );
+}
 
 export function StatusBadge({ status, className }: { status: DocketStatus; className?: string }) {
   const s = STATUS_TONE[status];

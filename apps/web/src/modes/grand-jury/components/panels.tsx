@@ -5,24 +5,21 @@ import {
   Alert,
   Amount,
   Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
   Countdown,
   Dialog,
   DialogContent,
   Icon,
+  PaperButton,
   Receipt,
   TextArea,
-  TextField,
+  PaperField,
   useToast,
 } from '@/ds';
 import { useCourtContext } from '../state/CourtProvider';
 import { useAction, useCourtNowMs } from '../state/hooks';
 import { sound } from '../lib';
 import styles from '../GrandJury.module.css';
-import { BallotChip, FundingMeter, JuryBox } from './parts';
+import { BallotChip, CourtPanel, FundingMeter, JuryBox } from './parts';
 
 /** Only real explorer links are shown; the demo ledger's memory:// receipts are not links. */
 const explorer = (url?: string) => (url?.startsWith('https://') ? url : undefined);
@@ -79,13 +76,7 @@ export function FundingPanel({ detail }: { detail: CaseDetail }) {
   ].filter((q) => q.value <= remaining);
 
   return (
-    <Card as="section" tone="ornate" aria-labelledby="summon-title" className={styles.actionCard}>
-      <CardHeader eyebrow="Step 1 · Anyone can chip in">
-        <CardTitle id="summon-title" as="h2">
-          Summon the court
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
+    <CourtPanel id="summon-title" tone="cream" backing="gold" className={styles.actionCard} eyebrow="Step 1 · Anyone can chip in" title="Summon the court">
         <FundingMeter raised={detail.raised} target={detail.target} summoners={detail.summoners} />
         {detail.viewer.contributed > 0n && (
           <p className={styles.youNote}>
@@ -100,13 +91,14 @@ export function FundingPanel({ detail }: { detail: CaseDetail }) {
                 {q.label}
               </Button>
             ))}
-            <Button type="button" size="sm" variant={raw === formatUsdc(remaining, { unit: false }) ? 'primary' : 'secondary'} onClick={() => setRaw(formatUsdc(remaining, { unit: false }))}>
+            <Button type="button" size="sm" variant={raw === formatUsdc(remaining, { unit: false }) ? 'primary' : 'secondary'} aria-pressed={raw === formatUsdc(remaining, { unit: false })} onClick={() => setRaw(formatUsdc(remaining, { unit: false }))}>
               Fill the rest
             </Button>
           </fieldset>
-          <TextField
+          <PaperField
             id={fieldId}
-            label="Your contribution"
+            label="Your contribution (test USDC)"
+            icon="sparkle"
             inputMode="decimal"
             autoComplete="off"
             value={raw}
@@ -120,9 +112,9 @@ export function FundingPanel({ detail }: { detail: CaseDetail }) {
               {action.error}
             </Alert>
           )}
-          <Button type="submit" variant="primary" fullWidth loading={action.pending} iconStart={<Icon name="gavel" />}>
+          <PaperButton type="submit" fullWidth loading={action.pending} iconStart={<Icon name="gavel" />}>
             Summon with {amount && !invalid ? formatUsdc(amount) : 'test USDC'}
-          </Button>
+          </PaperButton>
         </form>
         <ul className={styles.promises}>
           <li>
@@ -159,8 +151,7 @@ export function FundingPanel({ detail }: { detail: CaseDetail }) {
           </dl>
           <p>Fees are only kept when the trial reaches a verdict. Otherwise every summoner is refunded pro rata.</p>
         </details>
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }
 
@@ -191,9 +182,9 @@ function ScreeningDialog({ open, onOpenChange, detail }: { open: boolean; onOpen
             <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={busy}>
               Not now
             </Button>
-            <Button variant="primary" onClick={verify} loading={busy} iconStart={<Icon name="eye" />}>
+            <PaperButton onClick={verify} loading={busy} iconStart={<Icon name="eye" />}>
               {error ? 'Try again' : 'Verify with World ID'}
-            </Button>
+            </PaperButton>
           </>
         }
       >
@@ -253,9 +244,9 @@ function BallotForm({ detail }: { detail: CaseDetail }) {
           {seal.error}
         </Alert>
       )}
-      <Button type="submit" variant="swear" fullWidth disabled={choice === null} loading={seal.pending} iconStart={<Icon name="lock" />}>
+      <PaperButton type="submit" variant="maroon" fullWidth disabled={choice === null} loading={seal.pending} iconStart={<Icon name="lock" />}>
         Seal my ballot
-      </Button>
+      </PaperButton>
       <p className={styles.fineprint}>Only a fingerprint of your vote goes on the ledger. The secret that opens it stays on this device.</p>
     </form>
   );
@@ -332,9 +323,9 @@ function RevealForm({ detail }: { detail: CaseDetail }) {
           {reveal.error}
         </Alert>
       )}
-      <Button type="submit" variant="swear" fullWidth loading={reveal.pending} disabled={!detail.viewer.hasSalt && !scroll.trim()} iconStart={<Icon name="unlock" />}>
+      <PaperButton type="submit" variant="maroon" fullWidth loading={reveal.pending} disabled={!detail.viewer.hasSalt && !scroll.trim()} iconStart={<Icon name="unlock" />}>
         Open my scroll
-      </Button>
+      </PaperButton>
       <p className={styles.fineprint}>Miss this window and the bond is forfeited (disclosed on the case page).</p>
     </form>
   );
@@ -384,9 +375,9 @@ export function JurorPanel({ detail }: { detail: CaseDetail }) {
             </Alert>
           )}
           <div className={styles.buttonRow}>
-            <Button variant="swear" onClick={swear} loading={accept.pending} iconStart={<Icon name="gavel" />}>
+            <PaperButton variant="maroon" onClick={swear} loading={accept.pending} iconStart={<Icon name="gavel" />}>
               I swear to show up
-            </Button>
+            </PaperButton>
             <Button variant="ghost" onClick={() => void decline.run()} disabled={accept.pending}>
               Decline (free)
             </Button>
@@ -402,9 +393,9 @@ export function JurorPanel({ detail }: { detail: CaseDetail }) {
             Seven verified strangers decide. Pass a quick World ID check, take a random seat offer and post a {formatUsdc(detail.terms.bondPerJuror)} bond. Show up for both
             windows and you earn {formatUsdc(detail.terms.successBonusPerJuror)} on top of your bond.
           </p>
-          <Button variant="primary" fullWidth onClick={() => setScreening(true)} iconStart={<Icon name="user" />}>
+          <PaperButton fullWidth onClick={() => setScreening(true)} iconStart={<Icon name="user" />}>
             Volunteer for the jury
-          </Button>
+          </PaperButton>
           <p className={styles.fineprint}>Declining an offer never costs anything. Only an accepted seat can be forfeited, and only for not showing up.</p>
           <ScreeningDialog open={screening} onOpenChange={setScreening} detail={detail} />
         </>
@@ -454,9 +445,9 @@ export function JurorPanel({ detail }: { detail: CaseDetail }) {
             {settle.error}
           </Alert>
         )}
-        <Button variant="primary" fullWidth loading={settle.pending} onClick={() => void settle.run()} iconStart={<Icon name="scales" />}>
+        <PaperButton fullWidth loading={settle.pending} onClick={() => void settle.run()} iconStart={<Icon name="scales" />}>
           Settle and read the verdict
-        </Button>
+        </PaperButton>
       </>
     );
   } else {
@@ -464,17 +455,10 @@ export function JurorPanel({ detail }: { detail: CaseDetail }) {
   }
 
   return (
-    <Card as="section" tone="ornate" aria-labelledby="duty-title" className={styles.actionCard}>
-      <CardHeader eyebrow={eyebrow}>
-        <CardTitle id="duty-title" as="h2">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
+    <CourtPanel id="duty-title" tone="cream" backing="gold" className={styles.actionCard} eyebrow={eyebrow} title={title}>
         <JuryBox entry={detail} viewerSeat={v.seat} />
         {body}
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }
 
@@ -495,13 +479,7 @@ export function ClaimPanel({ detail }: { detail: CaseDetail }) {
     }
   };
   return (
-    <Card as="section" tone="parchment" aria-labelledby="claim-title" className={styles.actionCard}>
-      <CardHeader eyebrow={c.claimed ? 'Collected' : 'Ready to collect'}>
-        <CardTitle id="claim-title" as="h2">
-          {refund ? 'Your refund' : 'Your payout'}
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
+    <CourtPanel id="claim-title" tone="cream" className={styles.actionCard} eyebrow={c.claimed ? 'Collected' : 'Ready to collect'} title={refund ? 'Your refund' : 'Your payout'}>
         <Receipt
           caseNumber={detail.caseNumber}
           title={refund ? 'Refund receipt' : 'Jury duty receipt'}
@@ -521,13 +499,12 @@ export function ClaimPanel({ detail }: { detail: CaseDetail }) {
                   {claim.error}
                 </Alert>
               )}
-              <Button variant="primary" fullWidth loading={claim.pending} onClick={run} iconStart={<Icon name="sparkle" />}>
+              <PaperButton fullWidth loading={claim.pending} onClick={run} iconStart={<Icon name="sparkle" />}>
                 Collect {formatUsdc(c.amount)}
-              </Button>
+              </PaperButton>
             </>
           ))}
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }
 
@@ -544,13 +521,7 @@ export function GalleryPanel({ detail }: { detail: CaseDetail }) {
     if (r.ok) sound({ type: 'crowd', reaction: 'murmur' });
   };
   return (
-    <Card as="section" aria-labelledby="gallery-title">
-      <CardHeader eyebrow="Free · points only · never binding">
-        <CardTitle id="gallery-title" as="h2">
-          The gallery
-        </CardTitle>
-      </CardHeader>
-      <CardBody>
+    <CourtPanel id="gallery-title" tone="kraft" elevation={1} eyebrow="Free · points only · never binding" title="The gallery">
         {pct && tally ? (
           <>
             <p className={styles.panelLede}>THE GALLERY SAYS… ({tally.total} {tally.total === 1 ? 'call' : 'calls'})</p>
@@ -595,7 +566,6 @@ export function GalleryPanel({ detail }: { detail: CaseDetail }) {
         ) : (
           <p className={styles.panelLede}>The gallery is closed.</p>
         )}
-      </CardBody>
-    </Card>
+    </CourtPanel>
   );
 }
