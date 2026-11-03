@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { NavLink, type NavLinkProps } from 'react-router';
+import { Link, NavLink, useLocation, type NavLinkProps } from 'react-router';
 import { cx } from '../../lib/cx';
 import { Icon, type IconName } from '../Icon/Icon';
 import styles from './PaperNav.module.css';
@@ -36,28 +36,39 @@ export function PaperNavBar({ label, start, end, children, className, ...rest }:
   );
 }
 
-export interface PaperTabProps extends Omit<NavLinkProps, 'className' | 'children'> {
+export interface PaperTabProps extends Omit<NavLinkProps, 'className' | 'children' | 'style'> {
   icon?: IconName;
   children: ReactNode;
   className?: string;
   /** Mark active for extra paths (e.g. "The Court" while on a mode page). */
   activeFor?: (pathname: string) => boolean;
+  /** Override the router location (defaults to the current pathname). */
   pathname?: string;
 }
 
 /** A gold-outlined paper tab. The current page gets a filled gold tab and `aria-current="page"`. */
 export function PaperTab({ icon, children, className, activeFor, pathname, ...rest }: PaperTabProps) {
-  const forced = activeFor && pathname !== undefined ? activeFor(pathname) : false;
+  const location = useLocation();
+  const forced = activeFor ? activeFor(pathname ?? location.pathname) : false;
+  const content = (
+    <>
+      {icon && <Icon name={icon} className={styles.icon} />}
+      <span className={styles.label}>{children}</span>
+    </>
+  );
   return (
     <li className={styles.item}>
-      <NavLink
-        {...rest}
-        className={({ isActive }) => cx(styles.tab, (isActive || forced) && styles.active, className)}
-        aria-current={forced ? 'page' : undefined}
-      >
-        {icon && <Icon name={icon} className={styles.icon} />}
-        <span className={styles.label}>{children}</span>
-      </NavLink>
+      {forced ? (
+        // NavLink only emits aria-current when its own match succeeds, so a
+        // section tab that is current for a child page renders a plain Link.
+        <Link {...rest} className={cx(styles.tab, styles.active, className)} aria-current="page">
+          {content}
+        </Link>
+      ) : (
+        <NavLink {...rest} className={({ isActive }) => cx(styles.tab, isActive && styles.active, className)}>
+          {content}
+        </NavLink>
+      )}
     </li>
   );
 }
