@@ -5,8 +5,14 @@ import type { BadgeTone } from '@/ds';
 export const paths = {
   docket: '/grand-jury/docket',
   duty: '/grand-jury/duty',
+  pricing: '/grand-jury/pricing',
   case: (n: number) => `/grand-jury/case/${n}`,
 } as const;
+
+/** Statuses where the case is over and nothing more can happen except claims. */
+export function isClosed(status: DocketStatus): boolean {
+  return status === 'verdict' || status === 'mistrial' || status === 'cancelled';
+}
 
 /** Badge tone and live dot per docket status. */
 export const STATUS_TONE: Readonly<Record<DocketStatus, { tone: BadgeTone; dot?: boolean | 'pulse' }>> = {
