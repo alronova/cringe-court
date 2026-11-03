@@ -1,6 +1,6 @@
 import { CHARACTER_NAMES, SPEAKER_CHARACTER, type CourtLine } from '@cringe-court/core';
 import type { CaseDetail } from '@cringe-court/modes-grand-jury';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DialogueBox, ImpactText, PaperPanel, Portrait, RoundIconButton, cx, useMotion } from '@/ds';
 import { hearingLines, portraitOf, sound } from '../lib';
 import styles from '../GrandJury.module.css';
@@ -18,6 +18,13 @@ export interface TrialViewProps {
   detail: CaseDetail;
   /** Line to start on (defaults to the first). */
   startAt?: number;
+  /**
+   * Called with every beat as it comes up (including the first). This is the
+   * hand-off a room behind the hearing subscribes to: the roaming courtroom
+   * calls `roam.runBeat(line)` here. Decorative only; the dialogue box already
+   * speaks every line to assistive tech.
+   */
+  onBeat?: (line: CourtLine, index: number) => void;
 }
 
 const IMPACT: Partial<Record<NonNullable<CourtLine['beat']>, 'objection' | 'order' | 'counter' | 'cook'>> = {
@@ -42,7 +49,7 @@ const RISERS = [
   { key: 'against', character: 'defense', bench: 1 },
 ] as const;
 
-export function TrialView({ detail, startAt = 0 }: TrialViewProps) {
+export function TrialView({ detail, startAt = 0, onBeat }: TrialViewProps) {
   const { reduced } = useMotion();
   const lines = hearingLines(detail);
   const [index, setIndex] = useState(Math.min(startAt, Math.max(0, lines.length - 1)));
@@ -77,6 +84,14 @@ export function TrialView({ detail, startAt = 0 }: TrialViewProps) {
   }, [playing, line]);
 
   const onDone = useCallback(() => setTyped(true), []);
+
+  const beat = useRef(onBeat);
+  useEffect(() => {
+    beat.current = onBeat;
+  });
+  useEffect(() => {
+    if (line) beat.current?.(line, index);
+  }, [line, index]);
 
   if (!line) return null;
   const speaker = SPEAKER_CHARACTER[line.speaker];

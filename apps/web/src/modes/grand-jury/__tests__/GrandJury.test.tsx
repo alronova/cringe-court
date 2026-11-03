@@ -176,3 +176,17 @@ describe('loading and errors', () => {
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
   });
 });
+
+describe('TrialView seam', () => {
+  it('hands every beat to the room behind the hearing (the roam.runBeat hook)', async () => {
+    const { TrialView } = await import('../components/TrialView');
+    const { renderWithProviders } = await import('@/test/render');
+    const detail = (await demo.court.detail(await caseNumberOf('hot-dog-sandwich')))!;
+    const beats: number[] = [];
+    const user = userEvent.setup();
+    renderWithProviders(<TrialView detail={detail} onBeat={(line, i) => beats.push(i) && expect(line.id).toBe(detail.transcript[i]!.id)} />);
+    await user.click(screen.getByRole('button', { name: 'Next line' }));
+    await user.click(screen.getByRole('button', { name: 'Next line' }));
+    expect(beats).toEqual([0, 1, 2]);
+  });
+});

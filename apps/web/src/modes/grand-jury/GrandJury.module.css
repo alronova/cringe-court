@@ -259,9 +259,48 @@
   max-width: 100%;
 }
 
+@media (max-width: 640px) {
+  /* Two lines at most on a phone, so the folded tails still frame it. */
+  .heroRibbon[data-size] {
+    font-size: var(--cc-text-xl);
+  }
+}
+
+@media (max-width: 640px) {
+  .courtBarInner {
+    gap: var(--cc-space-2);
+  }
+
+  .subNav ul {
+    flex-wrap: nowrap;
+  }
+
+  .subNavLink {
+    padding: 0 var(--cc-space-3);
+    white-space: nowrap;
+  }
+
+  .walletLabel {
+    display: none;
+  }
+
+  .heroFacts {
+    flex-direction: column;
+    gap: var(--cc-space-1);
+  }
+
+  .heroFacts > [aria-hidden] {
+    display: none;
+  }
+
+  .wallet {
+    margin-left: auto;
+  }
+}
+
 .heroLede {
   max-width: var(--cc-prose-max);
-  margin: 0;
+  margin: var(--cc-space-2) 0 0;
   color: var(--cc-neutral-900);
   font-size: var(--cc-text-lg);
   line-height: var(--cc-leading-relaxed);
