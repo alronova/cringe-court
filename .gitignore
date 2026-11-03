@@ -18,3 +18,9 @@ node_modules/
 Thumbs.db
 *.swp
 *~
+
+# --- App build output ---
+apps/*/dist/
+packages/*/dist/
+*.tsbuildinfo
+coverage/
