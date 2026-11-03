@@ -65,6 +65,9 @@ cc-art/, judge/, …        the art pipeline (unchanged by this phase)
 docs/                     decisions, economics, architecture, design system
 ```
 
+Track p4 added `packages/ai`, `packages/engine` and `packages/scene`, the trial
+state machine and every port with its twin; see [`ENGINE.md`](ENGINE.md).
+
 Later phases add, without moving anything above:
 
 ```
