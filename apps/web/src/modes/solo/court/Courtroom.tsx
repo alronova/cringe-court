@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import type { AudioPort, CourtLine, PublicExhibit } from '@cringe-court/core';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import type { AudioPort, CastMember, CourtLine, PublicExhibit } from '@cringe-court/core';
 import { SEGMENT_TITLES, directAll, type Shot, type StageActor } from '@cringe-court/modes-solo';
 import { stagePose } from '@/art/art';
 import { Button, DialogueBox, IconButton, ImpactText, Stamp, cx, useReducedMotion, type ImpactKind } from '@/ds';
@@ -7,8 +7,22 @@ import { sceneArt, setFor } from '../lib/art';
 import { SoloIcon } from '../lib/SoloIcon';
 import styles from './Courtroom.module.css';
 
+const VoxelStage = lazy(() => import('./VoxelStage'));
+
+/** WebGL 2 present (jsdom and very old browsers get the illustrated stage). */
+function webglAvailable(): boolean {
+  if (typeof window === 'undefined' || typeof window.WebGL2RenderingContext === 'undefined') return false;
+  try {
+    return Boolean(document.createElement('canvas').getContext('webgl2'));
+  } catch {
+    return false;
+  }
+}
+
 export interface CourtroomProps {
   lines: readonly CourtLine[];
+  /** Who stands where (mode staging). With it, the trial plays in the 3D voxel courtroom when WebGL is available. */
+  cast?: readonly CastMember[];
   /** Case title, for the region label. */
   title: string;
   exhibits?: readonly PublicExhibit[];
@@ -49,14 +63,22 @@ function actorArt(actor: Actor, pose: string): string {
  * Space/K play–pause, ←/→ previous/next line (while focus is in the courtroom).
  * Screen readers hear each line once, in full, from a polite live region.
  */
-export function Courtroom({ lines, title, exhibits = [], autoPlay = true, onFinished, audio, actions, className }: CourtroomProps) {
+export function Courtroom({ lines, cast, title, exhibits = [], autoPlay = true, onFinished, audio, actions, className }: CourtroomProps) {
   const reduced = useReducedMotion();
   const shots = useMemo(() => directAll(lines), [lines]);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(autoPlay);
   const [typed, setTyped] = useState(false);
   const [showTranscript, setShowTranscript] = useState(false);
+  const [view, setView] = useState<'3d' | '2d'>('2d');
+  const [voxelReady, setVoxelReady] = useState(false);
+  const [voxelFailed, setVoxelFailed] = useState(false);
   const finishedRef = useRef(false);
+  const onVoxelReady = useCallback(() => setVoxelReady(true), []);
+  const onVoxelError = useCallback(() => {
+    setVoxelFailed(true);
+    setView('2d');
+  }, []);
   const rootRef = useRef<HTMLElement>(null);
   const shot = shots[index];
   const last = index === shots.length - 1;
@@ -72,9 +94,9 @@ export function Courtroom({ lines, title, exhibits = [], autoPlay = true, onFini
 
   // Sound cues for the new shot.
   useEffect(() => {
-    if (!shot || !audio) return;
+    if (!shot || !audio || view === '3d') return;
     for (const cue of shot.cues) audio.play(cue);
-  }, [shot, audio]);
+  }, [shot, audio, view]);
 
   // Auto-advance once the line is typed out and has been held long enough to read.
   useEffect(() => {
@@ -127,7 +149,14 @@ export function Courtroom({ lines, title, exhibits = [], autoPlay = true, onFini
 
   return (
     <section ref={rootRef} className={cx(styles.courtroom, className)} aria-label={`Courtroom: ${title}`} data-surface="wood">
-      <div className={styles.viewport}>
+      <div className={styles.viewport} data-view={view} data-voxel-ready={(view === '3d' && voxelReady) || undefined}>
+        {view === '3d' && cast && (
+          <div className={styles.voxelLayer} aria-hidden>
+            <Suspense fallback={null}>
+              <VoxelStage line={shot.line} cast={cast} audio={audio} onError={onVoxelError} onReady={onVoxelReady} />
+            </Suspense>
+          </div>
+        )}
         <div
           key={`fx-${index}`}
           className={styles.camera}
@@ -226,13 +255,21 @@ export function Courtroom({ lines, title, exhibits = [], autoPlay = true, onFini
           </div>
         </div>
         <div className={styles.extra}>
+          {cast && !voxelFailed && webglAvailable() && (
+            <Button size="sm" variant="ghost" aria-pressed={view === '3d'} onClick={() => setView((v) => (v === '3d' ? '2d' : '3d'))}>
+              3D courtroom (preview)
+            </Button>
+          )}
           <Button size="sm" variant="ghost" aria-expanded={showTranscript} onClick={() => setShowTranscript((s) => !s)}>
             {showTranscript ? 'Hide transcript' : 'Transcript'}
           </Button>
           {actions}
         </div>
       </div>
-      <p className={styles.hint}>Space to play or pause · ← → to move between lines</p>
+      <p className={styles.hint}>
+        Space to play or pause · ← → to move between lines
+        {voxelFailed && ' · The 3D courtroom could not load here, so this is the illustrated stage.'}
+      </p>
 
       {showTranscript && (
         <ol className={styles.transcript} aria-label="Full transcript" role="list">

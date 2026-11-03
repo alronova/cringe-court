@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import type { EvidenceState, PublicExhibit } from '@cringe-court/core';
-import { ANGLE_MAX, REDACTION_LABELS, type SoloSession, type SoloSnapshot } from '@cringe-court/modes-solo';
+import { ANGLE_MAX, REDACTION_LABELS, soloMode, type SoloSession, type SoloSnapshot } from '@cringe-court/modes-solo';
 import { Alert, Badge, Button, Card, CardBody, CardHeader, CardTitle, Icon, Portrait, Select, Skeleton, TextArea, TextField, cx } from '@/ds';
 import { Courtroom } from '../court/Courtroom';
 import styles from './FilePage.module.css';
@@ -175,7 +175,7 @@ export function BriefStep({ session, snap, hiddenNames, teaserAllowance }: Brief
           <h3 id="teaser-title" className={styles.sectionTitle}>
             Free teaser: opening statements
           </h3>
-          <Courtroom lines={snap.teaser} title={t.filing.title} exhibits={t.exhibits} />
+          <Courtroom lines={snap.teaser} cast={soloMode.staging(t.terms)} title={t.filing.title} exhibits={t.exhibits} />
           <Alert tone="info" title="The jury is out, and the AI never decides">
             The teaser stops here on purpose (D3). Real people decide the verdict. These openings carry over into your case.
           </Alert>

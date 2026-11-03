@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Navigate, useParams } from 'react-router';
 import { CANCEL_LABELS, formatCaseNumber } from '@cringe-court/core';
-import { isDemoTerms } from '@cringe-court/modes-solo';
+import { isDemoTerms, soloMode } from '@cringe-court/modes-solo';
 import { useDocumentTitle } from '@/app/useDocumentTitle';
 import { Badge, Button, ButtonLink, EmptyState, Icon, PhaseStepper, TestnetBadge } from '@/ds';
 import { Courtroom } from '../court/Courtroom';
@@ -109,6 +109,7 @@ export function CasePage() {
           </div>
           <Courtroom
             lines={t.transcript.lines}
+            cast={soloMode.staging(t.terms)}
             title={t.filing.title}
             exhibits={t.exhibits}
             audio={court.audio}
