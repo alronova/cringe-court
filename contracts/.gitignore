@@ -1,0 +1,11 @@
+node_modules/
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+dist/
+deployments/local-*.json
+.coverage_artifacts/
+.coverage_cache/
+.coverage_contracts/
