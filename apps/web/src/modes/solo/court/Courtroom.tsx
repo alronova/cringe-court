@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AudioPort, CastMember, CourtLine, PublicExhibit } from '@cringe-court/core';
 import { SEGMENT_TITLES, directAll, type Shot, type StageActor } from '@cringe-court/modes-solo';
 import { stagePose } from '@/art/art';
@@ -6,9 +6,8 @@ import { Button, DialogueBox, IconButton, ImpactText, Stamp, cx, useReducedMotio
 import { sceneArt, setFor } from '../lib/art';
 import { SoloIcon } from '../lib/SoloIcon';
 import { SoundToggle } from '../lib/SoundToggle';
+import { voxelTrialView, type TrialView } from './TrialView';
 import styles from './Courtroom.module.css';
-
-const VoxelStage = lazy(() => import('./VoxelStage'));
 
 /** WebGL 2 present (jsdom and very old browsers get the illustrated stage). */
 function webglAvailable(): boolean {
@@ -22,8 +21,10 @@ function webglAvailable(): boolean {
 
 export interface CourtroomProps {
   lines: readonly CourtLine[];
-  /** Who stands where (mode staging). With it, the trial plays in the 3D voxel courtroom when WebGL is available. */
+  /** Who stands where (mode staging). With it, the trial can also play in `view`. */
   cast?: readonly CastMember[];
+  /** The room rendered behind the dialogue (see TrialView.ts). Defaults to the voxel courtroom. */
+  view?: TrialView;
   /** Case title, for the region label. */
   title: string;
   exhibits?: readonly PublicExhibit[];
@@ -64,7 +65,7 @@ function actorArt(actor: Actor, pose: string): string {
  * Space/K play–pause, ←/→ previous/next line (while focus is in the courtroom).
  * Screen readers hear each line once, in full, from a polite live region.
  */
-export function Courtroom({ lines, cast, title, exhibits = [], autoPlay = true, onFinished, audio, actions, className }: CourtroomProps) {
+export function Courtroom({ lines, cast, view: trialView = voxelTrialView, title, exhibits = [], autoPlay = true, onFinished, audio, actions, className }: CourtroomProps) {
   const reduced = useReducedMotion();
   const shots = useMemo(() => directAll(lines), [lines]);
   const [index, setIndex] = useState(0);
@@ -95,9 +96,9 @@ export function Courtroom({ lines, cast, title, exhibits = [], autoPlay = true, 
 
   // Sound cues for the new shot.
   useEffect(() => {
-    if (!shot || !audio || view === '3d') return;
+    if (!shot || !audio || (view === '3d' && trialView.ownsSound)) return;
     for (const cue of shot.cues) audio.play(cue);
-  }, [shot, audio, view]);
+  }, [shot, audio, view, trialView.ownsSound]);
 
   // Auto-advance once the line is typed out and has been held long enough to read.
   useEffect(() => {
@@ -154,7 +155,15 @@ export function Courtroom({ lines, cast, title, exhibits = [], autoPlay = true, 
         {view === '3d' && cast && (
           <div className={styles.voxelLayer} aria-hidden>
             <Suspense fallback={null}>
-              <VoxelStage line={shot.line} cast={cast} audio={audio} onError={onVoxelError} onReady={onVoxelReady} />
+              <trialView.Component
+                line={shot.line}
+                index={index}
+                cast={cast}
+                audio={audio}
+                reducedMotion={reduced}
+                onError={onVoxelError}
+                onReady={onVoxelReady}
+              />
             </Suspense>
           </div>
         )}
@@ -257,9 +266,9 @@ export function Courtroom({ lines, cast, title, exhibits = [], autoPlay = true, 
         </div>
         <div className={styles.extra}>
           {audio && <SoundToggle />}
-          {cast && !voxelFailed && webglAvailable() && (
+          {cast && !voxelFailed && (!trialView.requiresWebGL || webglAvailable()) && (
             <Button size="sm" variant="ghost" aria-pressed={view === '3d'} onClick={() => setView((v) => (v === '3d' ? '2d' : '3d'))}>
-              3D courtroom (preview)
+              {trialView.label}
             </Button>
           )}
           <Button size="sm" variant="ghost" aria-expanded={showTranscript} onClick={() => setShowTranscript((s) => !s)}>
@@ -270,7 +279,7 @@ export function Courtroom({ lines, cast, title, exhibits = [], autoPlay = true, 
       </div>
       <p className={styles.hint}>
         Space to play or pause · ← → to move between lines
-        {voxelFailed && ' · The 3D courtroom could not load here, so this is the illustrated stage.'}
+        {voxelFailed && ` · “${trialView.label}” could not load here, so this is the illustrated stage.`}
       </p>
 
       {showTranscript && (

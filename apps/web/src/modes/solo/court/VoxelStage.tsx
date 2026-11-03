@@ -8,23 +8,13 @@
  * Lazy-loaded: three.js only downloads when someone watches a trial.
  */
 import { useEffect, useRef } from 'react';
-import type { AudioPort, CastMember, CourtLine } from '@cringe-court/core';
 import { directTrial } from '@cringe-court/engine';
 import { Courtroom as VoxelCanvas, useCourtroom } from '@cringe-court/scene/react';
-import { useReducedMotion } from '@/ds';
+import type { TrialViewProps } from './TrialView';
 import styles from './Courtroom.module.css';
 
-export interface VoxelStageProps {
-  line: CourtLine;
-  cast: readonly CastMember[];
-  audio?: AudioPort;
-  /** The scene could not load (no WebGL, asset error): fall back to the illustrated stage. */
-  onError: (error: Error) => void;
-  onReady: () => void;
-}
-
-export default function VoxelStage({ line, cast, audio, onError, onReady }: VoxelStageProps) {
-  const reduced = useReducedMotion();
+/** The default TrialView. `onError` (no WebGL, asset error) drops back to the illustrated stage. */
+export default function VoxelStage({ line, cast, audio, reducedMotion: reduced, onError, onReady }: TrialViewProps) {
   const status = useCourtroom({ reducedMotion: reduced });
   const talking = useRef<string | null>(null);
   const castReady = useRef(false);

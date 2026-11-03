@@ -5,6 +5,7 @@ import type { CourtLine } from '@cringe-court/core';
 import { RecordingAudio } from '@cringe-court/core/testing';
 import { renderWithProviders } from '@/test/render';
 import { Courtroom } from '../court/Courtroom';
+import type { TrialView, TrialViewProps } from '../court/TrialView';
 
 const LINES: CourtLine[] = [
   { id: 'L01', speaker: 'judge', segment: 'call-to-order', beat: 'gavel', text: 'ORDER! Court is in session.' },
@@ -66,5 +67,32 @@ describe('Courtroom', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('drives a pluggable TrialView beat by beat and falls back to the illustrated stage when it fails', async () => {
+    const user = userEvent.setup();
+    const beats: Array<[number, string]> = [];
+    let fail: ((e: Error) => void) | undefined;
+    function FakeView({ line, index, onReady, onError }: TrialViewProps) {
+      beats.push([index, line.id]);
+      fail = onError;
+      onReady();
+      return null;
+    }
+    const view: TrialView = { Component: FakeView, label: 'Roam the court', requiresWebGL: false, ownsSound: true };
+    const audio = new RecordingAudio();
+    renderWithProviders(<Courtroom lines={LINES} cast={[]} view={view} title="Reply-all" autoPlay={false} audio={audio} />);
+    const toggle = screen.getByRole('button', { name: 'Roam the court' });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    const before = audio.cues().length;
+    await user.click(screen.getByRole('button', { name: 'Next line' }));
+    expect(beats.at(-1)).toEqual([1, 'L02']);
+    // The view owns sound while it is on: Courtroom does not double the cues.
+    expect(audio.cues().length).toBe(before);
+    act(() => fail!(new Error('no roam')));
+    expect(screen.queryByRole('button', { name: 'Roam the court' })).not.toBeInTheDocument();
+    expect(screen.getByText(/“Roam the court” could not load here/)).toBeInTheDocument();
+    expect(live()).toHaveTextContent('Miss Ratio: The facts are cooked.');
   });
 });
