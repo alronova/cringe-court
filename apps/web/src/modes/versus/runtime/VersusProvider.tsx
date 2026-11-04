@@ -1,5 +1,5 @@
 import type { AudioEngine } from '@cringe-court/audio';
-import { ZERO_USDC, type AiCounselPort, type IdentityPort, type SaltVault } from '@cringe-court/core';
+import { ZERO_USDC, monotonicUnixClock, type AiCounselPort, type IdentityPort, type SaltVault } from '@cringe-court/core';
 import { VersusCounsel, VersusDesk, VersusError, World, type FactStore, type Persona, type VersusDeskOptions, type WorldSnapshot } from '@cringe-court/modes-versus';
 import { BackendError } from '@cringe-court/net';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -61,7 +61,12 @@ export function VersusProvider({
 }: VersusProviderProps) {
   const { toast } = useToast();
   const store = useMemo(() => storeProp ?? new LocalFactStore(), [storeProp]);
-  const clock = useMemo(() => clockProp ?? (() => Math.floor(Date.now() / 1000)), [clockProp]);
+  // Monotonic after page load (B19): a wall-clock jump does not expire invites or jury windows.
+  const clock = useMemo(() => {
+    if (clockProp) return clockProp;
+    const real = monotonicUnixClock();
+    return () => Math.floor(real());
+  }, [clockProp]);
   const counsel = useMemo(() => counselProp ?? new VersusCounsel({ latencyMs: 1400 }), [counselProp]);
   const salts = useMemo(() => saltsProp ?? new LocalSaltVault(), [saltsProp]);
   const audio = audioProp ?? appAudio();

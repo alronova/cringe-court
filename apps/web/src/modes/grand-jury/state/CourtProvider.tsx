@@ -51,10 +51,12 @@ export function CourtProvider({
     const id = window.setInterval(() => {
       if (document.hidden || ticking.current) return;
       ticking.current = true;
-      void step().finally(() => {
-        ticking.current = false;
-        setVersion((v) => v + 1);
-      });
+      void step()
+        .catch((e: unknown) => console.warn('[grand-jury] simulation tick failed', e))
+        .finally(() => {
+          ticking.current = false;
+          setVersion((v) => v + 1);
+        });
     }, 1000);
     return () => window.clearInterval(id);
   }, [demo, tick]);
