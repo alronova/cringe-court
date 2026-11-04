@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { caseNumber, formatUsdc, usdc } from '@cringe-court/core';
 import { ANGLE, DRAFT, FILER, runJury, setup, toJury } from './helpers';
-import type { SoloSession } from '../index';
+import { shareSummary, type SoloSession } from '../index';
 
 describe('SoloSession — the whole case', () => {
   it('runs confession → counsel → payment → NPC jury → verdict → share on the ledger', async () => {
@@ -315,5 +315,25 @@ describe('SoloSession — deadlines that pass while nobody is watching (B1)', ()
     await session.commitBallot(1);
     expect(session.getSnapshot().error).toBeNull();
     expect(session.getSnapshot().trial).toMatchObject({ stage: 'jury', step: 'reveal' });
+  });
+});
+
+describe('SoloSession — NO VERDICT copy says what happened (B13 in Solo)', () => {
+  it('blames missed windows, not a split jury: three jurors with two needed can never deadlock', async () => {
+    const { session, ports } = setup();
+    await toJury(session);
+    for (let i = 0; i < 3; i++) await session.seatNextJuror();
+    await session.commitBallot(1);
+    ports.clock.advance(60 * 60);
+    for (let i = 0; i < 6 && session.getSnapshot().trial.stage === 'jury'; i++) {
+      const t = session.getSnapshot().trial;
+      if (t.stage === 'jury' && t.step === 'finalizing') await session.finalize();
+      else await session.commitBallot(2);
+    }
+    const s = session.getSnapshot();
+    if (s.trial.stage !== 'verdict') throw new Error(s.trial.stage);
+    expect(s.trial.sentence?.text).not.toMatch(/could not agree/);
+    expect(shareSummary(s.trial).shareText).not.toMatch(/could not agree/);
+    expect(shareSummary(s.trial).shareText).toMatch(/not enough jurors voted in time/);
   });
 });

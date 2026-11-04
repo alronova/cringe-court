@@ -276,3 +276,10 @@ describe('DemoClock and wall-clock jumps (B19)', () => {
     expect(clock.now() - before).toBeGreaterThanOrEqual(60);
   });
 });
+
+describe('demo commit window vs the hearing (B2)', () => {
+  it('outlasts a ~174 s first-person hearing plus two minutes to decide', async () => {
+    const { DEMO_DEADLINES } = await import('../demo');
+    expect(DEMO_DEADLINES.commit).toBeGreaterThanOrEqual(174 + 120);
+  });
+});

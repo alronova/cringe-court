@@ -238,9 +238,14 @@ describe('simulation heartbeat', () => {
 describe('loading and errors', () => {
   it('shows the loading state, then an error with a retry when the court fails to start', async () => {
     let fail!: (e: Error) => void;
-    __setDemoCourtForTests(new Promise((_, reject) => (fail = reject)));
+    const starting = new Promise<never>((_, reject) => (fail = reject));
+    const subscribed = vi.spyOn(starting, 'then');
+    __setDemoCourtForTests(starting);
     renderAt('/grand-jury/docket');
     expect(await screen.findByText('Calling the court to order…')).toBeInTheDocument();
+    // Fail only once the provider is listening: on a loaded machine its effect can run after the first paint,
+    // and rejecting earlier leaves a (briefly) unhandled rejection that is the test's doing, not the app's.
+    await waitFor(() => expect(subscribed).toHaveBeenCalled());
     await act(async () => fail(new Error('ledger offline')));
     expect(await screen.findByText('The court could not sit')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();

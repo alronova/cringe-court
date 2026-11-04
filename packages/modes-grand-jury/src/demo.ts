@@ -30,8 +30,13 @@ import { DEMO_CASE_FILES } from './fixtures/docket';
 import { MemoryGalleryStore } from './gallery';
 import { MemoryStorage, StorageSaltVault, type KeyValueStorage } from './salts';
 
-/** Shortened demo windows (seconds). Production: 48 h / 30 min / 20 min / 10 min. */
-export const DEMO_DEADLINES = { preTrial: 45 * 60, recruitment: 15 * 60, commit: 4 * 60, reveal: 3 * 60 } as const;
+/**
+ * Shortened demo windows (seconds). Production: 48 h / 30 min / 20 min / 10 min.
+ * The commit window opens with the hearing, so it must outlast it: the
+ * first-person hearing runs about 3 min (174 s in the playtest) and a juror
+ * then needs time to decide (UX evaluation B2, same rule as Versus).
+ */
+export const DEMO_DEADLINES = { preTrial: 45 * 60, recruitment: 15 * 60, commit: 6 * 60, reveal: 3 * 60 } as const;
 
 /** A clock that can be pinned (while seeding history) and skipped forward (demo control). Unix seconds. */
 export class DemoClock {
