@@ -69,6 +69,7 @@ export class CourtConnection {
   readonly #statusListeners = new Set<Listener<ConnectionStatus>>();
   readonly #events = new Map<keyof ServerEvents, Set<Listener<unknown>>>();
   readonly #resync = new Set<() => void>();
+  readonly #unauthorized = new Set<() => void>();
   #abort: AbortController | null = null;
   #pollTimer: ReturnType<typeof setInterval> | null = null;
   #retryTimer: ReturnType<typeof setTimeout> | null = null;
@@ -165,6 +166,7 @@ export class CourtConnection {
     } catch {
       throw new BackendError('unreachable', 'The connection dropped mid-answer.', res.status);
     }
+    if (res.status === 401 && this.#token) this.#onUnauthorized();
     if (!res.ok) {
       let parsed: ErrorBody | null = null;
       try {
@@ -208,6 +210,16 @@ export class CourtConnection {
   onResync(fn: () => void): () => void {
     this.#resync.add(fn);
     return () => this.#resync.delete(fn);
+  }
+
+  /** Called when the server no longer knows this device's token (it was reset). */
+  onUnauthorized(fn: () => void): () => void {
+    this.#unauthorized.add(fn);
+    return () => this.#unauthorized.delete(fn);
+  }
+
+  #onUnauthorized(): void {
+    for (const fn of [...this.#unauthorized]) fn();
   }
 
   /** Open the live stream (idempotent). */
@@ -278,6 +290,11 @@ export class CourtConnection {
     } catch {
       if (controller.signal.aborted && !this.#running) return;
       this.#scheduleRetry();
+      return;
+    }
+    if (res.status === 401) {
+      // Retrying with a token the server forgot would never succeed: hand over to the session owner.
+      this.#onUnauthorized();
       return;
     }
     if (!res.ok || !res.body) {

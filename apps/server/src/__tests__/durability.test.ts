@@ -109,3 +109,20 @@ describe('reconnect and restart', () => {
     await server.close();
   });
 });
+
+describe('a reset server', () => {
+  it('tells a live device its token is unknown, instead of retrying forever', async () => {
+    const port = await freePort();
+    let server = await startServer({ config: { port } });
+    const d = await device(server.url, { live: true });
+    await until(() => d.connection.status === 'live', 5000, 'live');
+    let told = 0;
+    d.connection.onUnauthorized(() => told++);
+    await server.close();
+    server = await startServer({ config: { port } });
+    await until(() => told > 0, 20_000, 'the unauthorized signal');
+    d.close();
+    await server.close();
+  });
+});
+
