@@ -24,3 +24,6 @@ apps/*/dist/
 packages/*/dist/
 *.tsbuildinfo
 coverage/
+
+# --- Court server local data (JSON-lines store, generated secret) ---
+.data/
