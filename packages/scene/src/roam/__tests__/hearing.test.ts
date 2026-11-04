@@ -150,6 +150,25 @@ describe('seating by role (B6)', () => {
     });
   }
 
+  it('a juror in the box watches the bench when the jury retires, not a neighbour at point-blank range', () => {
+    const c = new RoamController(world, { role: 'juror', spawn: 'aisle' });
+    const judge = world.marks.judge!;
+    const jury = world.marks.jury!;
+    const off = (target: readonly number[]) => {
+      const v = c.view();
+      const yaw = Math.atan2(-(target[0]! - v.eye[0]), -(target[2]! - v.eye[2]));
+      return Math.abs(Math.atan2(Math.sin(v.yaw - yaw), Math.cos(v.yaw - yaw)));
+    };
+    let sawJuryOut = false;
+    c.subscribe((e) => e.type === 'callout' && e.style === 'jury-out' && (sawJuryOut = true));
+    void c.runBeat('jury-deliberating', { lines: [say('judge', 'THE JURY IS OUT.')] });
+    // Play to the "look at the jury" step: just after the JURY IS OUT callout.
+    for (let i = 0; i < 600 && !sawJuryOut; i++) c.update(1 / 30);
+    for (let i = 0; i < 20; i++) c.update(1 / 30);
+    expect(off(judge)).toBeLessThan(0.3);
+    expect(off(jury)).toBeGreaterThan(0.5);
+  });
+
   it('only parties rise for the verdict; jurors and spectators are not called "Defendant"', () => {
     const party = beatScript('verdict', { party: true });
     const juror = beatScript('verdict', { party: false });

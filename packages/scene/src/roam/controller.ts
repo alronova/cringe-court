@@ -563,6 +563,8 @@ export class RoamController implements BeatHost {
 
   #resolveTarget(at: string | Vec3): Vec3 {
     if (typeof at !== 'string') return at;
+    // Seated in the box, "look at the jury" would stare into a neighbour's face: watch the bench instead.
+    if (at === 'jury' && this.#seat?.id === 'jury-box') at = 'judge';
     return this.world.marks[at] ?? this.world.marks.judge ?? [0, 50, -60];
   }
 
