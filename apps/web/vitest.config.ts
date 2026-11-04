@@ -1,4 +1,4 @@
-import { defineProject, mergeConfig } from 'vitest/config';
+import { configDefaults, defineProject, mergeConfig } from 'vitest/config';
 import viteConfig from './vite.config';
 
 export default mergeConfig(
@@ -9,6 +9,8 @@ export default mergeConfig(
       environment: 'jsdom',
       globals: true,
       setupFiles: ['./src/test/setup.ts'],
+      // The Playwright e2e specs run under `npm run e2e`, not vitest.
+      exclude: [...configDefaults.exclude, 'e2e/**'],
       testTimeout: 20000,
       css: { modules: { classNameStrategy: 'non-scoped' } },
     },

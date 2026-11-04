@@ -139,13 +139,20 @@ export async function playVersusAcrossDevices(browser, base, shots) {
   await waitText(B, 'The jury has spoken', 30000).catch(() => waitText(B, 'NO VERDICT', 5000));
   await sleep(1500);
   await shots.shot(B, 'B-device-verdict');
-  for (const [who, p] of [
-    ['A', A],
-    ['B', B],
-    ['J', J],
+  // Who may claim is the settlement table (docs/ECONOMICS.md §2): after a
+  // verdict the sides' halves were spent (bragging rights only, no refund) and
+  // only the timely juror has money to pull (bond 0.40 + reward 0.30). After
+  // NO VERDICT each side gets its own 0.70 back. Server suite: versus.claims.test.ts.
+  const mistrial = await hasText(A, 'NO VERDICT');
+  for (const [who, p, expected] of [
+    ['A', A, mistrial],
+    ['B', B, mistrial],
+    ['J', J, true],
   ]) {
     const claimed = await clickText(p, 'Claim', 'button', 5000).then(() => true).catch(() => false);
-    shots.step(`${who}: claim offered = ${claimed}`);
+    shots.step(`${who}: claim offered = ${claimed} (expected ${expected})`);
+    if (claimed !== expected) throw new Error(`${who} claim offered = ${claimed}, expected ${expected} for ${mistrial ? 'no verdict' : 'a verdict'}`);
+    if (!expected && !(await hasText(p, 'Nothing to claim on this case'))) throw new Error(`${who} should be told there is nothing to claim`);
   }
   await sleep(1500);
   await shots.shot(J, 'J-device-after-claim');

@@ -25,7 +25,7 @@ export const ROAM_CSS = `
 .ccr-btn--ghost:hover{background:${C.gold100}}
 .ccr-btn--sm{font-size:13px;padding:7px 10px;min-height:36px}
 .ccr-key{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;margin-right:6px;font-family:var(--cc-font-pixel,'Pixelify Sans',ui-monospace,monospace);font-size:13px;color:${C.neutral900};background:${C.gold100};border:2px solid ${C.neutral900};box-shadow:0 3px 0 ${C.neutral900};vertical-align:middle}
-.ccr-top{position:absolute;left:12px;right:12px;top:12px;display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
+.ccr-top{position:absolute;z-index:1;left:12px;right:12px;top:12px;display:flex;align-items:flex-start;gap:10px;justify-content:space-between}
 .ccr-zone{padding:6px 10px 6px 8px;font-size:14px;white-space:nowrap;color:${C.neutral100};background:${alpha(C.neutral900, .78)};border:2px solid var(--cc-color-frame,${C.gold500});display:flex;gap:8px;align-items:center}
 .ccr-zone b{color:var(--cc-color-highlight,${C.gold300});font-weight:400}
 .ccr-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
@@ -45,8 +45,8 @@ export const ROAM_CSS = `
 .ccr-callout--order{background:${C.neutral900};color:var(--cc-color-highlight,${C.gold300})}
 .ccr-callout--jury-out{background:var(--cc-teal-700,${C.teal900})}
 @keyframes ccr-pop{0%{transform:translateX(-50%) rotate(-3deg) scale(.4)}100%{transform:translateX(-50%) rotate(-3deg) scale(1)}}
-.ccr-beat{position:absolute;left:12px;top:56px;padding:6px 8px 6px 10px;font-size:13px;color:${C.neutral100};background:${alpha(C.royal900, .9)};border:2px solid var(--cc-color-frame,${C.gold500});display:flex;gap:10px;align-items:center;pointer-events:auto}
-.ccr-legend{position:absolute;right:12px;top:64px;width:min(300px,calc(100% - 24px));max-height:calc(100% - 76px);overflow:auto;overscroll-behavior:contain;padding:12px 14px;font-size:14px;pointer-events:auto}
+.ccr-beat{position:absolute;z-index:1;left:12px;top:56px;padding:6px 8px 6px 10px;font-size:13px;color:${C.neutral100};background:${alpha(C.royal900, .9)};border:2px solid var(--cc-color-frame,${C.gold500});display:flex;gap:10px;align-items:center;pointer-events:auto}
+.ccr-legend{position:absolute;z-index:1;right:12px;top:64px;width:min(300px,calc(100% - 24px));max-height:calc(100% - 76px);overflow:auto;overscroll-behavior:contain;padding:12px 14px;font-size:14px;pointer-events:auto}
 .ccr-legend--inline{position:static;width:auto;max-height:none;overflow:visible;padding:10px 0 0;border-top:2px dashed ${C.neutral500}}
 .ccr-legend h2,.ccr-modal h2{margin:0 0 8px;font-size:16px;font-weight:400;color:var(--cc-color-accent,${C.royal900})}
 .ccr-legend ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
@@ -70,7 +70,8 @@ export const ROAM_CSS = `
 .ccr-exhibit-body{padding:16px 18px 18px;display:grid;gap:14px;background:${C.gold100};background-image:repeating-linear-gradient(0deg,transparent 0 25px,${alpha(C.neutral500, .35)} 25px 26px)}
 .ccr-exhibit-body p{margin:0;font-size:16px;line-height:26px}
 .ccr-stamp{justify-self:end;padding:4px 10px;font-size:13px;color:var(--cc-color-accent,${C.royal900});border:3px solid currentColor;transform:rotate(-4deg)}
-.ccr-touch{position:absolute;inset:0;pointer-events:none}
+/* Touch look/stick zones sit under the HUD chrome (top bar, beat chip, legend) so those stay tappable. */
+.ccr-touch{position:absolute;inset:0;pointer-events:none;z-index:0}
 .ccr-look-zone{position:absolute;top:0;right:0;bottom:0;left:42%;pointer-events:auto}
 .ccr-stick-zone{position:absolute;left:0;bottom:0;width:42%;height:62%;pointer-events:auto}
 .ccr-stick{position:absolute;width:128px;height:128px;margin:-64px 0 0 -64px;border-radius:50%;background:${alpha(C.neutral100, .18)};border:3px solid ${alpha(C.neutral100, .7)};box-shadow:0 0 0 3px ${alpha(C.neutral900, .5)}}
