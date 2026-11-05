@@ -27,3 +27,8 @@ coverage/
 
 # --- Court server local data (JSON-lines store, generated secret) ---
 .data/
+
+# --- Court AI local secrets (see docs/ai/10). Only the .example file is tracked ---
+.env.court
+**/.env.court
+.court-transcripts/
