@@ -6,6 +6,11 @@ coverage/
 coverage.json
 dist/
 deployments/local-*.json
+deployments/arc-testnet.json
+out/
+forge-cache/
+broadcast/
+lib/
 .coverage_artifacts/
 .coverage_cache/
 .coverage_contracts/

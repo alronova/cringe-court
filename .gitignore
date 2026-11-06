@@ -31,4 +31,6 @@ coverage/
 # --- Court AI local secrets (see docs/ai/10). Only the .example file is tracked ---
 .env.court
 **/.env.court
+.env.local
+**/.env.local
 .court-transcripts/
